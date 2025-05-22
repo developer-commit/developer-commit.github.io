@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>달팽이 배열 (C&#43;&#43; 구현 및 해설) | Blog-A</title>
+<meta name="keywords" content="C&#43;&#43;, 달팽이, 문제 풀이, 알고리즘, 프로그래머스">
+<meta name="description" content="달팽이 배열 문제는 N x N 크기의 정사각형 배열을 시계 방향으로 나선형으로 채우는 전형적인 구현 문제입니다.
+예를 들어 N = 3일 경우, 배열은 다음과 같이 채워집니다:
+1 2 3  
+8 9 4  
+7 6 5
+🧠 문제 해결 아이디어
+
+
+방향 기반 순회:
+
+오른쪽 → 아래 → 왼쪽 → 위 방향으로 회전하며 채웁니다.
+방향 전환 조건은 배열의 범위를 벗어나거나 이미 숫자가 있는 경우입니다.
+
+
+
+시계 방향 회전:
+
+4개의 방향을 정의하고 현재 방향을 기준으로 이동 후, 조건에 따라 방향을 전환합니다.
+
+
+
+
+🧾 코드 1: 직관적 방향 배열 방식
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+vector&lt;vector&lt;int&gt;&gt; snail(int N) {
+    vector&lt;vector&lt;int&gt;&gt; board(N, vector&lt;int&gt;(N, 0));
+    int dx[4] = {0, 1, 0, -1}; // 우, 하, 좌, 상
+    int dy[4] = {1, 0, -1, 0};
+    int x = 0, y = 0, dir = 0;
+
+    for (int num = 1; num &lt;= N * N; &#43;&#43;num) {
+        board[x][y] = num;
+        int nx = x &#43; dx[dir];
+        int ny = y &#43; dy[dir];
+
+        if (nx &gt;= 0 &amp;&amp; nx &lt; N &amp;&amp; ny &gt;= 0 &amp;&amp; ny &lt; N &amp;&amp; board[nx][ny] == 0) {
+            x = nx;
+            y = ny;
+        } else {
+            dir = (dir &#43; 1) % 4;
+            x &#43;= dx[dir];
+            y &#43;= dy[dir];
+        }
+    }
+
+    return board;
+}
+
+int main() {
+    int N = 3;
+    auto result = snail(N);
+    for (const auto&amp; row : result) {
+        for (int num : row) {
+            cout &lt;&lt; num &lt;&lt; &#34; &#34;;
+        }
+        cout &lt;&lt; endl;
+    }
+    return 0;
+}
+
+🧾 코드 2: 가로/세로 번갈아가며 채우기 (다른 해석 방식)
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;iostream&gt;
+
+using namespace std;
+
+vector&lt;vector&lt;int&gt;&gt; solution(int n) {
+    vector&lt;vector&lt;int&gt;&gt; answer(n, vector&lt;int&gt;(n));
+
+    int x = 0;
+    int loc_x = -1, loc_y = 0;
+    bool flag = true;
+
+    for(int i = n ; i &gt; 0; ) {
+        for(int j = 0; j &lt; i ; j&#43;&#43;) {
+            if (flag) answer[loc_y][&#43;&#43;loc_x] = &#43;&#43;x;
+            else answer[loc_y][--loc_x] = &#43;&#43;x;
+        }
+        i--;
+        if (x == n*n) break;
+        flag = !flag;
+
+        for(int j = 0; j &lt; i ; j&#43;&#43;) {
+            if (flag)  answer[--loc_y][loc_x] = &#43;&#43;x;
+            else answer[&#43;&#43;loc_y][loc_x] = &#43;&#43;x;
+        }
+    }
+
+    return answer;
+}
+이 방식은 가로 → 세로 → 가로 → 세로 순으로 줄어드는 길이를 기준으로 채우는 구조이며, 배열을 달팽이 형태로 자연스럽게 채울 수 있습니다.">
+<meta name="author" content="">
+<link rel="canonical" href="https://developer-commit.github.io/codingtest/programmars-181832/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.93f625d739f1d6a5c6f20c146bc6a8d26b233492b34b2220c54b12fd46a04ded.css" integrity="sha256-k/Yl1znx1qXG8gwUa8ao0msjNJKzSyIgxUsS/UagTe0=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://developer-commit.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://developer-commit.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://developer-commit.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://developer-commit.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://developer-commit.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://developer-commit.github.io/codingtest/programmars-181832/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:url" content="https://developer-commit.github.io/codingtest/programmars-181832/">
+  <meta property="og:site_name" content="Blog-A">
+  <meta property="og:title" content="달팽이 배열 (C&#43;&#43; 구현 및 해설)">
+  <meta property="og:description" content="달팽이 배열 문제는 N x N 크기의 정사각형 배열을 시계 방향으로 나선형으로 채우는 전형적인 구현 문제입니다.
+예를 들어 N = 3일 경우, 배열은 다음과 같이 채워집니다:
+1 2 3 8 9 4 7 6 5 🧠 문제 해결 아이디어 방향 기반 순회:
+오른쪽 → 아래 → 왼쪽 → 위 방향으로 회전하며 채웁니다. 방향 전환 조건은 배열의 범위를 벗어나거나 이미 숫자가 있는 경우입니다. 시계 방향 회전:
+4개의 방향을 정의하고 현재 방향을 기준으로 이동 후, 조건에 따라 방향을 전환합니다. 🧾 코드 1: 직관적 방향 배열 방식 #include &lt;iostream&gt; #include &lt;vector&gt; using namespace std; vector&lt;vector&lt;int&gt;&gt; snail(int N) { vector&lt;vector&lt;int&gt;&gt; board(N, vector&lt;int&gt;(N, 0)); int dx[4] = {0, 1, 0, -1}; // 우, 하, 좌, 상 int dy[4] = {1, 0, -1, 0}; int x = 0, y = 0, dir = 0; for (int num = 1; num &lt;= N * N; &#43;&#43;num) { board[x][y] = num; int nx = x &#43; dx[dir]; int ny = y &#43; dy[dir]; if (nx &gt;= 0 &amp;&amp; nx &lt; N &amp;&amp; ny &gt;= 0 &amp;&amp; ny &lt; N &amp;&amp; board[nx][ny] == 0) { x = nx; y = ny; } else { dir = (dir &#43; 1) % 4; x &#43;= dx[dir]; y &#43;= dy[dir]; } } return board; } int main() { int N = 3; auto result = snail(N); for (const auto&amp; row : result) { for (int num : row) { cout &lt;&lt; num &lt;&lt; &#34; &#34;; } cout &lt;&lt; endl; } return 0; } 🧾 코드 2: 가로/세로 번갈아가며 채우기 (다른 해석 방식) #include &lt;string&gt; #include &lt;vector&gt; #include &lt;iostream&gt; using namespace std; vector&lt;vector&lt;int&gt;&gt; solution(int n) { vector&lt;vector&lt;int&gt;&gt; answer(n, vector&lt;int&gt;(n)); int x = 0; int loc_x = -1, loc_y = 0; bool flag = true; for(int i = n ; i &gt; 0; ) { for(int j = 0; j &lt; i ; j&#43;&#43;) { if (flag) answer[loc_y][&#43;&#43;loc_x] = &#43;&#43;x; else answer[loc_y][--loc_x] = &#43;&#43;x; } i--; if (x == n*n) break; flag = !flag; for(int j = 0; j &lt; i ; j&#43;&#43;) { if (flag) answer[--loc_y][loc_x] = &#43;&#43;x; else answer[&#43;&#43;loc_y][loc_x] = &#43;&#43;x; } } return answer; } 이 방식은 가로 → 세로 → 가로 → 세로 순으로 줄어드는 길이를 기준으로 채우는 구조이며, 배열을 달팽이 형태로 자연스럽게 채울 수 있습니다.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="codingtest">
+    <meta property="article:published_time" content="2025-05-23T00:00:00+09:00">
+    <meta property="article:modified_time" content="2025-05-23T00:00:00+09:00">
+    <meta property="article:tag" content="C&#43;&#43;">
+    <meta property="article:tag" content="달팽이">
+    <meta property="article:tag" content="문제 풀이">
+    <meta property="article:tag" content="알고리즘">
+    <meta property="article:tag" content="프로그래머스">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="달팽이 배열 (C&#43;&#43; 구현 및 해설)">
+<meta name="twitter:description" content="달팽이 배열 문제는 N x N 크기의 정사각형 배열을 시계 방향으로 나선형으로 채우는 전형적인 구현 문제입니다.
+예를 들어 N = 3일 경우, 배열은 다음과 같이 채워집니다:
+1 2 3  
+8 9 4  
+7 6 5
+🧠 문제 해결 아이디어
+
+
+방향 기반 순회:
+
+오른쪽 → 아래 → 왼쪽 → 위 방향으로 회전하며 채웁니다.
+방향 전환 조건은 배열의 범위를 벗어나거나 이미 숫자가 있는 경우입니다.
+
+
+
+시계 방향 회전:
+
+4개의 방향을 정의하고 현재 방향을 기준으로 이동 후, 조건에 따라 방향을 전환합니다.
+
+
+
+
+🧾 코드 1: 직관적 방향 배열 방식
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+vector&lt;vector&lt;int&gt;&gt; snail(int N) {
+    vector&lt;vector&lt;int&gt;&gt; board(N, vector&lt;int&gt;(N, 0));
+    int dx[4] = {0, 1, 0, -1}; // 우, 하, 좌, 상
+    int dy[4] = {1, 0, -1, 0};
+    int x = 0, y = 0, dir = 0;
+
+    for (int num = 1; num &lt;= N * N; &#43;&#43;num) {
+        board[x][y] = num;
+        int nx = x &#43; dx[dir];
+        int ny = y &#43; dy[dir];
+
+        if (nx &gt;= 0 &amp;&amp; nx &lt; N &amp;&amp; ny &gt;= 0 &amp;&amp; ny &lt; N &amp;&amp; board[nx][ny] == 0) {
+            x = nx;
+            y = ny;
+        } else {
+            dir = (dir &#43; 1) % 4;
+            x &#43;= dx[dir];
+            y &#43;= dy[dir];
+        }
+    }
+
+    return board;
+}
+
+int main() {
+    int N = 3;
+    auto result = snail(N);
+    for (const auto&amp; row : result) {
+        for (int num : row) {
+            cout &lt;&lt; num &lt;&lt; &#34; &#34;;
+        }
+        cout &lt;&lt; endl;
+    }
+    return 0;
+}
+
+🧾 코드 2: 가로/세로 번갈아가며 채우기 (다른 해석 방식)
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;iostream&gt;
+
+using namespace std;
+
+vector&lt;vector&lt;int&gt;&gt; solution(int n) {
+    vector&lt;vector&lt;int&gt;&gt; answer(n, vector&lt;int&gt;(n));
+
+    int x = 0;
+    int loc_x = -1, loc_y = 0;
+    bool flag = true;
+
+    for(int i = n ; i &gt; 0; ) {
+        for(int j = 0; j &lt; i ; j&#43;&#43;) {
+            if (flag) answer[loc_y][&#43;&#43;loc_x] = &#43;&#43;x;
+            else answer[loc_y][--loc_x] = &#43;&#43;x;
+        }
+        i--;
+        if (x == n*n) break;
+        flag = !flag;
+
+        for(int j = 0; j &lt; i ; j&#43;&#43;) {
+            if (flag)  answer[--loc_y][loc_x] = &#43;&#43;x;
+            else answer[&#43;&#43;loc_y][loc_x] = &#43;&#43;x;
+        }
+    }
+
+    return answer;
+}
+이 방식은 가로 → 세로 → 가로 → 세로 순으로 줄어드는 길이를 기준으로 채우는 구조이며, 배열을 달팽이 형태로 자연스럽게 채울 수 있습니다.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Codingtests",
+      "item": "https://developer-commit.github.io/codingtest/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "달팽이 배열 (C++ 구현 및 해설)",
+      "item": "https://developer-commit.github.io/codingtest/programmars-181832/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "달팽이 배열 (C++ 구현 및 해설)",
+  "name": "달팽이 배열 (C\u002b\u002b 구현 및 해설)",
+  "description": "달팽이 배열 문제는 N x N 크기의 정사각형 배열을 시계 방향으로 나선형으로 채우는 전형적인 구현 문제입니다.\n예를 들어 N = 3일 경우, 배열은 다음과 같이 채워집니다:\n1 2 3 8 9 4 7 6 5 🧠 문제 해결 아이디어 방향 기반 순회:\n오른쪽 → 아래 → 왼쪽 → 위 방향으로 회전하며 채웁니다. 방향 전환 조건은 배열의 범위를 벗어나거나 이미 숫자가 있는 경우입니다. 시계 방향 회전:\n4개의 방향을 정의하고 현재 방향을 기준으로 이동 후, 조건에 따라 방향을 전환합니다. 🧾 코드 1: 직관적 방향 배열 방식 #include \u0026lt;iostream\u0026gt; #include \u0026lt;vector\u0026gt; using namespace std; vector\u0026lt;vector\u0026lt;int\u0026gt;\u0026gt; snail(int N) { vector\u0026lt;vector\u0026lt;int\u0026gt;\u0026gt; board(N, vector\u0026lt;int\u0026gt;(N, 0)); int dx[4] = {0, 1, 0, -1}; // 우, 하, 좌, 상 int dy[4] = {1, 0, -1, 0}; int x = 0, y = 0, dir = 0; for (int num = 1; num \u0026lt;= N * N; ++num) { board[x][y] = num; int nx = x + dx[dir]; int ny = y + dy[dir]; if (nx \u0026gt;= 0 \u0026amp;\u0026amp; nx \u0026lt; N \u0026amp;\u0026amp; ny \u0026gt;= 0 \u0026amp;\u0026amp; ny \u0026lt; N \u0026amp;\u0026amp; board[nx][ny] == 0) { x = nx; y = ny; } else { dir = (dir + 1) % 4; x += dx[dir]; y += dy[dir]; } } return board; } int main() { int N = 3; auto result = snail(N); for (const auto\u0026amp; row : result) { for (int num : row) { cout \u0026lt;\u0026lt; num \u0026lt;\u0026lt; \u0026#34; \u0026#34;; } cout \u0026lt;\u0026lt; endl; } return 0; } 🧾 코드 2: 가로/세로 번갈아가며 채우기 (다른 해석 방식) #include \u0026lt;string\u0026gt; #include \u0026lt;vector\u0026gt; #include \u0026lt;iostream\u0026gt; using namespace std; vector\u0026lt;vector\u0026lt;int\u0026gt;\u0026gt; solution(int n) { vector\u0026lt;vector\u0026lt;int\u0026gt;\u0026gt; answer(n, vector\u0026lt;int\u0026gt;(n)); int x = 0; int loc_x = -1, loc_y = 0; bool flag = true; for(int i = n ; i \u0026gt; 0; ) { for(int j = 0; j \u0026lt; i ; j++) { if (flag) answer[loc_y][++loc_x] = ++x; else answer[loc_y][--loc_x] = ++x; } i--; if (x == n*n) break; flag = !flag; for(int j = 0; j \u0026lt; i ; j++) { if (flag) answer[--loc_y][loc_x] = ++x; else answer[++loc_y][loc_x] = ++x; } } return answer; } 이 방식은 가로 → 세로 → 가로 → 세로 순으로 줄어드는 길이를 기준으로 채우는 구조이며, 배열을 달팽이 형태로 자연스럽게 채울 수 있습니다.\n",
+  "keywords": [
+    "C++", "달팽이", "문제 풀이", "알고리즘", "프로그래머스"
+  ],
+  "articleBody": "달팽이 배열 문제는 N x N 크기의 정사각형 배열을 시계 방향으로 나선형으로 채우는 전형적인 구현 문제입니다.\n예를 들어 N = 3일 경우, 배열은 다음과 같이 채워집니다:\n1 2 3 8 9 4 7 6 5 🧠 문제 해결 아이디어 방향 기반 순회:\n오른쪽 → 아래 → 왼쪽 → 위 방향으로 회전하며 채웁니다. 방향 전환 조건은 배열의 범위를 벗어나거나 이미 숫자가 있는 경우입니다. 시계 방향 회전:\n4개의 방향을 정의하고 현재 방향을 기준으로 이동 후, 조건에 따라 방향을 전환합니다. 🧾 코드 1: 직관적 방향 배열 방식 #include #include using namespace std; vector\u003cvector\u003cint\u003e\u003e snail(int N) { vector\u003cvector\u003cint\u003e\u003e board(N, vector\u003cint\u003e(N, 0)); int dx[4] = {0, 1, 0, -1}; // 우, 하, 좌, 상 int dy[4] = {1, 0, -1, 0}; int x = 0, y = 0, dir = 0; for (int num = 1; num \u003c= N * N; ++num) { board[x][y] = num; int nx = x + dx[dir]; int ny = y + dy[dir]; if (nx \u003e= 0 \u0026\u0026 nx \u003c N \u0026\u0026 ny \u003e= 0 \u0026\u0026 ny \u003c N \u0026\u0026 board[nx][ny] == 0) { x = nx; y = ny; } else { dir = (dir + 1) % 4; x += dx[dir]; y += dy[dir]; } } return board; } int main() { int N = 3; auto result = snail(N); for (const auto\u0026 row : result) { for (int num : row) { cout \u003c\u003c num \u003c\u003c \" \"; } cout \u003c\u003c endl; } return 0; } 🧾 코드 2: 가로/세로 번갈아가며 채우기 (다른 해석 방식) #include #include #include using namespace std; vector\u003cvector\u003cint\u003e\u003e solution(int n) { vector\u003cvector\u003cint\u003e\u003e answer(n, vector\u003cint\u003e(n)); int x = 0; int loc_x = -1, loc_y = 0; bool flag = true; for(int i = n ; i \u003e 0; ) { for(int j = 0; j \u003c i ; j++) { if (flag) answer[loc_y][++loc_x] = ++x; else answer[loc_y][--loc_x] = ++x; } i--; if (x == n*n) break; flag = !flag; for(int j = 0; j \u003c i ; j++) { if (flag) answer[--loc_y][loc_x] = ++x; else answer[++loc_y][loc_x] = ++x; } } return answer; } 이 방식은 가로 → 세로 → 가로 → 세로 순으로 줄어드는 길이를 기준으로 채우는 구조이며, 배열을 달팽이 형태로 자연스럽게 채울 수 있습니다.\n",
+  "wordCount" : "366",
+  "inLanguage": "en",
+  "datePublished": "2025-05-23T00:00:00+09:00",
+  "dateModified": "2025-05-23T00:00:00+09:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://developer-commit.github.io/codingtest/programmars-181832/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Blog-A",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://developer-commit.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://developer-commit.github.io/" accesskey="h" title="Blog-A (Alt + H)">Blog-A</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://developer-commit.github.io/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      달팽이 배열 (C&#43;&#43; 구현 및 해설)
+    </h1>
+    <div class="post-meta"><span title='2025-05-23 00:00:00 +0900 KST'>May 23, 2025</span>
+
+</div>
+  </header> 
+  <div class="post-content"><p>달팽이 배열 문제는 N x N 크기의 정사각형 배열을 시계 방향으로 나선형으로 채우는 전형적인 구현 문제입니다.</p>
+<p>예를 들어 N = 3일 경우, 배열은 다음과 같이 채워집니다:</p>
+<pre tabindex="0"><code>1 2 3  
+8 9 4  
+7 6 5
+</code></pre><h2 id="-문제-해결-아이디어">🧠 문제 해결 아이디어<a hidden class="anchor" aria-hidden="true" href="#-문제-해결-아이디어">#</a></h2>
+<ol>
+<li>
+<p><strong>방향 기반 순회</strong>:</p>
+<ul>
+<li>오른쪽 → 아래 → 왼쪽 → 위 방향으로 회전하며 채웁니다.</li>
+<li>방향 전환 조건은 배열의 범위를 벗어나거나 이미 숫자가 있는 경우입니다.</li>
+</ul>
+</li>
+<li>
+<p><strong>시계 방향 회전</strong>:</p>
+<ul>
+<li>4개의 방향을 정의하고 현재 방향을 기준으로 이동 후, 조건에 따라 방향을 전환합니다.</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="-코드-1-직관적-방향-배열-방식">🧾 코드 1: 직관적 방향 배열 방식<a hidden class="anchor" aria-hidden="true" href="#-코드-1-직관적-방향-배열-방식">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;vector&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">using</span> <span style="color:#66d9ef">namespace</span> std;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>vector<span style="color:#f92672">&lt;</span>vector<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;&gt;</span> snail(<span style="color:#66d9ef">int</span> N) {
+</span></span><span style="display:flex;"><span>    vector<span style="color:#f92672">&lt;</span>vector<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;&gt;</span> board(N, vector<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span>(N, <span style="color:#ae81ff">0</span>));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> dx[<span style="color:#ae81ff">4</span>] <span style="color:#f92672">=</span> {<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>}; <span style="color:#75715e">// 우, 하, 좌, 상
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">int</span> dy[<span style="color:#ae81ff">4</span>] <span style="color:#f92672">=</span> {<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>};
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> x <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, y <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, dir <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> num <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>; num <span style="color:#f92672">&lt;=</span> N <span style="color:#f92672">*</span> N; <span style="color:#f92672">++</span>num) {
+</span></span><span style="display:flex;"><span>        board[x][y] <span style="color:#f92672">=</span> num;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> nx <span style="color:#f92672">=</span> x <span style="color:#f92672">+</span> dx[dir];
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> ny <span style="color:#f92672">=</span> y <span style="color:#f92672">+</span> dy[dir];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (nx <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> nx <span style="color:#f92672">&lt;</span> N <span style="color:#f92672">&amp;&amp;</span> ny <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> ny <span style="color:#f92672">&lt;</span> N <span style="color:#f92672">&amp;&amp;</span> board[nx][ny] <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>            x <span style="color:#f92672">=</span> nx;
+</span></span><span style="display:flex;"><span>            y <span style="color:#f92672">=</span> ny;
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            dir <span style="color:#f92672">=</span> (dir <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%</span> <span style="color:#ae81ff">4</span>;
+</span></span><span style="display:flex;"><span>            x <span style="color:#f92672">+=</span> dx[dir];
+</span></span><span style="display:flex;"><span>            y <span style="color:#f92672">+=</span> dy[dir];
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> board;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> N <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">auto</span> result <span style="color:#f92672">=</span> snail(N);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">auto</span><span style="color:#f92672">&amp;</span> row : result) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> num : row) {
+</span></span><span style="display:flex;"><span>            cout <span style="color:#f92672">&lt;&lt;</span> num <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34; &#34;</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        cout <span style="color:#f92672">&lt;&lt;</span> endl;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><hr>
+<h2 id="-코드-2-가로세로-번갈아가며-채우기-다른-해석-방식">🧾 코드 2: 가로/세로 번갈아가며 채우기 (다른 해석 방식)<a hidden class="anchor" aria-hidden="true" href="#-코드-2-가로세로-번갈아가며-채우기-다른-해석-방식">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;string&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;vector&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> <span style="color:#66d9ef">namespace</span> std;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>vector<span style="color:#f92672">&lt;</span>vector<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;&gt;</span> solution(<span style="color:#66d9ef">int</span> n) {
+</span></span><span style="display:flex;"><span>    vector<span style="color:#f92672">&lt;</span>vector<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;&gt;</span> answer(n, vector<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span>(n));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> x <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> loc_x <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, loc_y <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">bool</span> flag <span style="color:#f92672">=</span> true;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span>(<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> n ; i <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>; ) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span>(<span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; j <span style="color:#f92672">&lt;</span> i ; j<span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (flag) answer[loc_y][<span style="color:#f92672">++</span>loc_x] <span style="color:#f92672">=</span> <span style="color:#f92672">++</span>x;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span> answer[loc_y][<span style="color:#f92672">--</span>loc_x] <span style="color:#f92672">=</span> <span style="color:#f92672">++</span>x;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        i<span style="color:#f92672">--</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (x <span style="color:#f92672">==</span> n<span style="color:#f92672">*</span>n) <span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>        flag <span style="color:#f92672">=</span> <span style="color:#f92672">!</span>flag;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span>(<span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; j <span style="color:#f92672">&lt;</span> i ; j<span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (flag)  answer[<span style="color:#f92672">--</span>loc_y][loc_x] <span style="color:#f92672">=</span> <span style="color:#f92672">++</span>x;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span> answer[<span style="color:#f92672">++</span>loc_y][loc_x] <span style="color:#f92672">=</span> <span style="color:#f92672">++</span>x;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> answer;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>이 방식은 가로 → 세로 → 가로 → 세로 순으로 줄어드는 길이를 기준으로 채우는 구조이며, 배열을 달팽이 형태로 자연스럽게 채울 수 있습니다.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://developer-commit.github.io/tags/c&#43;&#43;/">C&#43;&#43;</a></li>
+      <li><a href="https://developer-commit.github.io/tags/%EB%8B%AC%ED%8C%BD%EC%9D%B4/">달팽이</a></li>
+      <li><a href="https://developer-commit.github.io/tags/%EB%AC%B8%EC%A0%9C-%ED%92%80%EC%9D%B4/">문제 풀이</a></li>
+      <li><a href="https://developer-commit.github.io/tags/%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98/">알고리즘</a></li>
+      <li><a href="https://developer-commit.github.io/tags/%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%A8%B8%EC%8A%A4/">프로그래머스</a></li>
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="https://developer-commit.github.io/">Blog-A</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>
