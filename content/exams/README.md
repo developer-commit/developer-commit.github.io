@@ -4,6 +4,8 @@
 
 - 작성 규칙·형식·좋은 문제의 조건: [`docs/EXAM_GUIDE.md`](../../docs/EXAM_GUIDE.md)
 - 형식 정의: [`exam.schema.json`](./exam.schema.json)
-- 완성 예시: [`blockchain-2026-2.json`](./blockchain-2026-2.json) (블록체인 1–9강, 242문항)
+- 완성 예시
+  - 객관식: [`blockchain-2026-2.json`](./blockchain-2026-2.json) (블록체인 1–9강, 242문항)
+  - 주관식: [`blockchain-2026-2-subjective.json`](./blockchain-2026-2-subjective.json) (단답·빈칸 107 + 서술 26문항)
 
 추가한 뒤에는 `npm run validate`로 검사한다.

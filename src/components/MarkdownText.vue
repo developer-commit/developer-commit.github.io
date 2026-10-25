@@ -5,10 +5,13 @@ import { renderInline, renderMarkdown } from '../lib/markdown.js'
 const props = defineProps({
   text: { type: String, default: '' },
   block: { type: Boolean, default: false }, // true: 글 본문처럼 블록 렌더링
+  breaks: { type: Boolean, default: false }, // block일 때 줄바꿈 한 번도 줄바꿈으로
   tag: { type: String, default: 'div' },
 })
 
-const html = computed(() => (props.block ? renderMarkdown(props.text) : renderInline(props.text)))
+const html = computed(() =>
+  props.block ? renderMarkdown(props.text, { breaks: props.breaks }) : renderInline(props.text),
+)
 </script>
 
 <template>

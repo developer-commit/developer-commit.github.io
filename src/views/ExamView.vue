@@ -2,10 +2,11 @@
 import { computed, ref, watch } from 'vue'
 import { findExam } from '../lib/exams.js'
 import { loadProgress, recordAttempt, resetProgress, saveSession } from '../lib/examStore.js'
-import { createSession, grade } from '../lib/examSession.js'
+import { createSession, grade, needsSelfGrade } from '../lib/examSession.js'
 import { useTitle } from '../lib/title.js'
 import ExamSetup from '../components/exam/ExamSetup.vue'
 import ExamRunner from '../components/exam/ExamRunner.vue'
+import ExamSelfGrade from '../components/exam/ExamSelfGrade.vue'
 import ExamResult from '../components/exam/ExamResult.vue'
 import NotFoundView from './NotFoundView.vue'
 
@@ -13,17 +14,18 @@ const props = defineProps({ id: String })
 
 const exam = computed(() => findExam(props.id))
 const progress = ref(exam.value ? loadProgress(exam.value.id) : null)
-const phase = ref('setup') // setup → run → result
+const phase = ref('setup') // setup → run → (서술형이 있으면 selfgrade) → result
 const session = ref(null)
 const result = ref(null)
 
 useTitle(() => exam.value?.title || '')
 
 // 답할 때마다 진행 상황을 저장해 두어, 새로고침해도 이어 풀 수 있게 한다.
+const inProgress = () => session.value && (phase.value === 'run' || phase.value === 'selfgrade')
 watch(
-  () => session.value && phase.value === 'run' && JSON.stringify(session.value.answers),
+  () => inProgress() && JSON.stringify(session.value.answers),
   () => {
-    if (session.value && phase.value === 'run') saveSession(exam.value.id, session.value)
+    if (inProgress()) saveSession(exam.value.id, session.value)
   },
 )
 
@@ -52,6 +54,18 @@ function answer(id, orig) {
 }
 
 function submit() {
+  // 아직 모범답안을 안 본 서술형이 있으면 자기 채점 단계를 먼저 거친다
+  if (phase.value === 'run' && needsSelfGrade(exam.value, session.value)) {
+    const answers = { ...session.value.answers }
+    for (const { id } of session.value.items) {
+      const q = exam.value.questions.find((x) => x.id === id)
+      if (q.kind === 'essay') answers[id] = { text: '', points: [], ...(answers[id] || {}), revealed: true }
+    }
+    session.value.answers = answers
+    phase.value = 'selfgrade'
+    scrollTop()
+    return
+  }
   result.value = grade(exam.value, session.value)
   progress.value = recordAttempt(exam.value.id, {
     mode: session.value.mode,
@@ -96,11 +110,12 @@ function reset() {
     <header class="exam-head">
       <RouterLink to="/exams/" class="muted back">← 시험 목록</RouterLink>
       <h1 class="page-title">{{ exam.title }}</h1>
-      <p class="muted">{{ exam.course }} · {{ exam.count }}문항</p>
+      <p class="muted">{{ exam.course }} · {{ exam.format }} {{ exam.count }}문항</p>
     </header>
 
     <ExamSetup v-if="phase === 'setup'" :exam="exam" :progress="progress" @start="start" @resume="resume" @reset="reset" />
     <ExamRunner v-else-if="phase === 'run'" :exam="exam" :session="session" @answer="answer" @submit="submit" @quit="quit" />
+    <ExamSelfGrade v-else-if="phase === 'selfgrade'" :exam="exam" :session="session" @answer="answer" @done="submit" />
     <ExamResult
       v-else
       :session="session"

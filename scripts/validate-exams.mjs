@@ -3,6 +3,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import katex from 'katex'
+import { normalizeAnswer } from '../src/lib/answerMatch.js'
 
 const dir = resolve(import.meta.dirname, '../content/exams')
 const errors = []
@@ -14,7 +15,14 @@ const ID = /^[a-z0-9][a-z0-9-]*$/
 const QID = /^[A-Za-z0-9][A-Za-z0-9_-]*$/
 const DATE = /^\d{4}-\d{2}-\d{2}$/
 const TOP_KEYS = new Set(['$schema', 'id', 'title', 'course', 'description', 'tags', 'updated', 'sections'])
-const Q_KEYS = new Set(['id', 'type', 'prompt', 'box', 'choices', 'answer', 'fixedOrder', 'explanation'])
+const Q_KEYS = new Set(['id', 'kind', 'type', 'prompt', 'box', 'choices', 'answer', 'fixedOrder', 'blanks', 'anyOrder', 'modelAnswer', 'keyPoints', 'explanation'])
+const KINDS = new Set(['choice', 'short', 'essay'])
+// 한 종류의 문항에서만 쓰는 필드
+const KIND_ONLY = {
+  choices: 'choice', answer: 'choice', fixedOrder: 'choice',
+  blanks: 'short', anyOrder: 'short',
+  modelAnswer: 'essay', keyPoints: 'essay',
+}
 
 const nonEmpty = (v) => typeof v === 'string' && v.trim().length > 0
 
@@ -83,24 +91,68 @@ for (const file of readdirSync(dir).sort()) {
       if (!nonEmpty(q.type)) err(qw, '"type" 이 비어 있습니다')
       if (!nonEmpty(q.prompt)) err(qw, '"prompt" 가 비어 있습니다')
       else checkMarkdown(`${qw} › prompt`, q.prompt)
-      if (!nonEmpty(q.explanation)) err(qw, '"explanation" 이 비어 있습니다')
+      const kind = q.kind ?? 'choice'
+      if (!KINDS.has(kind)) {
+        err(qw, `"kind" 는 ${[...KINDS].map((k) => `"${k}"`).join(' / ')} 중 하나 (생략하면 choice)`)
+        continue
+      }
+      for (const k of Object.keys(q)) {
+        if (KIND_ONLY[k] && KIND_ONLY[k] !== kind) err(qw, `"${k}" 는 kind "${KIND_ONLY[k]}" 문항에서만 씁니다`)
+      }
+
+      if (kind === 'essay') {
+        if (q.explanation !== undefined) checkMarkdown(`${qw} › explanation`, q.explanation)
+      } else if (!nonEmpty(q.explanation)) err(qw, '"explanation" 이 비어 있습니다')
       else checkMarkdown(`${qw} › explanation`, q.explanation)
 
-      if (!Array.isArray(q.choices) || q.choices.length < 2 || q.choices.length > 6) {
-        err(qw, '"choices" 는 보기 2–6개짜리 배열')
-      } else {
-        q.choices.forEach((c, ci) => {
-          if (!nonEmpty(c)) err(qw, `choices[${ci}] 가 비어 있습니다`)
-          else checkMarkdown(`${qw} › choices[${ci}]`, c)
-        })
-        if (new Set(q.choices.map((c) => String(c).trim())).size !== q.choices.length) err(qw, '같은 보기가 두 번 있습니다')
-        if (!Number.isInteger(q.answer) || q.answer < 1 || q.answer > q.choices.length) {
-          err(qw, `"answer" 는 1–${q.choices.length} 사이 정수 (1 = 첫 번째 보기)`)
-        } else if (q.choices.length === 4) {
-          answerSpread[q.answer] = (answerSpread[q.answer] || 0) + 1
+      if (kind === 'choice') {
+        if (!Array.isArray(q.choices) || q.choices.length < 2 || q.choices.length > 6) {
+          err(qw, '"choices" 는 보기 2–6개짜리 배열')
+        } else {
+          q.choices.forEach((c, ci) => {
+            if (!nonEmpty(c)) err(qw, `choices[${ci}] 가 비어 있습니다`)
+            else checkMarkdown(`${qw} › choices[${ci}]`, c)
+          })
+          if (new Set(q.choices.map((c) => String(c).trim())).size !== q.choices.length) err(qw, '같은 보기가 두 번 있습니다')
+          if (!Number.isInteger(q.answer) || q.answer < 1 || q.answer > q.choices.length) {
+            err(qw, `"answer" 는 1–${q.choices.length} 사이 정수 (1 = 첫 번째 보기)`)
+          } else if (q.choices.length === 4) {
+            answerSpread[q.answer] = (answerSpread[q.answer] || 0) + 1
+          }
+        }
+        if (q.fixedOrder !== undefined && typeof q.fixedOrder !== 'boolean') err(qw, '"fixedOrder" 는 true/false')
+      }
+
+      if (kind === 'short') {
+        if (!Array.isArray(q.blanks) || q.blanks.length < 1 || q.blanks.length > 10) {
+          err(qw, '"blanks" 는 빈칸 1–10개짜리 배열 (각 빈칸 = 허용 답안 문자열 배열)')
+        } else {
+          q.blanks.forEach((accepted, bi) => {
+            if (!Array.isArray(accepted) || !accepted.length || !accepted.every(nonEmpty)) {
+              err(qw, `blanks[${bi}] 는 비어 있지 않은 허용 답안 문자열 배열이어야 합니다 (예: ["SHA-256", "SHA256"])`)
+              return
+            }
+            const norm = accepted.map(normalizeAnswer)
+            if (norm.some((n) => !n)) err(qw, `blanks[${bi}] 에 비교 후 빈 문자열이 되는 답안이 있습니다 (기호만 쓴 답안)`)
+            const dup = accepted.filter((_, i) => norm.indexOf(norm[i]) !== i)
+            if (dup.length) warn(qw, `blanks[${bi}] 의 ${dup.map((d) => `"${d}"`).join(', ')} 는 띄어쓰기·대소문자 무시 규칙상 이미 있는 답안과 같습니다 (빼도 됨)`)
+          })
+          if (q.anyOrder !== undefined && typeof q.anyOrder !== 'boolean') err(qw, '"anyOrder" 는 true/false')
+          if (q.anyOrder) {
+            const all = q.blanks.flatMap((a, bi) => (Array.isArray(a) ? a.map((x) => [normalizeAnswer(x), bi]) : []))
+            const clash = all.find(([n, bi]) => all.some(([m, bj]) => m === n && bj !== bi))
+            if (clash) err(qw, `anyOrder 빈칸끼리 같은 허용 답안이 있습니다 ("${clash[0]}") — 칸마다 답이 달라야 합니다`)
+          }
         }
       }
-      if (q.fixedOrder !== undefined && typeof q.fixedOrder !== 'boolean') err(qw, '"fixedOrder" 는 true/false')
+
+      if (kind === 'essay') {
+        if (!nonEmpty(q.modelAnswer)) err(qw, '"modelAnswer"(모범답안) 이 비어 있습니다')
+        else checkMarkdown(`${qw} › modelAnswer`, q.modelAnswer)
+        if (!Array.isArray(q.keyPoints) || q.keyPoints.length < 1 || q.keyPoints.length > 8 || !q.keyPoints.every(nonEmpty)) {
+          err(qw, '"keyPoints"(채점 핵심 요소) 는 비어 있지 않은 문자열 1–8개')
+        } else q.keyPoints.forEach((p, pi) => checkMarkdown(`${qw} › keyPoints[${pi}]`, p))
+      }
 
       if (q.box !== undefined) {
         if (Array.isArray(q.box)) {

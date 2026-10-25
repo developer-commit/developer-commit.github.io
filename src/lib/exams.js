@@ -8,24 +8,28 @@ function normalize(raw) {
   const questions = []
   const sections = raw.sections.map((s) => {
     const qs = s.questions.map((q) => {
+      const kind = q.kind || 'choice' // choice(객관식) · short(단답·빈칸) · essay(서술)
       const item = {
         ...q,
+        kind,
         number: questions.length + 1,
         sectionId: s.id,
         sectionTitle: s.title,
-        answerIndex: q.answer - 1, // 데이터는 1부터, 내부 계산은 0부터
       }
+      if (kind === 'choice') item.answerIndex = q.answer - 1 // 데이터는 1부터, 내부 계산은 0부터
       questions.push(item)
       return item
     })
     return { id: s.id, title: s.title, questions: qs }
   })
-  return { ...raw, sections, questions, count: questions.length }
+  const kinds = new Set(questions.map((q) => q.kind))
+  const format = kinds.size > 1 && kinds.has('choice') ? '혼합' : kinds.has('choice') ? '객관식' : '주관식'
+  return { ...raw, sections, questions, count: questions.length, format, hasChoice: kinds.has('choice') }
 }
 
 export const exams = Object.values(files)
   .map(normalize)
-  .sort((a, b) => (a.updated < b.updated ? 1 : -1))
+  .sort((a, b) => (a.updated === b.updated ? a.id.localeCompare(b.id) : a.updated < b.updated ? 1 : -1))
 
 export const findExam = (id) => exams.find((e) => e.id === id)
 export const examPath = (e) => `/exams/${e.id}/`

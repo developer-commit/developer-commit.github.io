@@ -97,7 +97,7 @@ function confirmReset() {
       <div class="seg">
         <label :class="{ on: config.mode === 'practice' }">
           <input v-model="config.mode" type="radio" value="practice" />
-          연습 모드 <span class="muted">고르면 바로 정답·해설</span>
+          연습 모드 <span class="muted">문항마다 바로 정답·해설</span>
         </label>
         <label :class="{ on: config.mode === 'exam' }">
           <input v-model="config.mode" type="radio" value="exam" />
@@ -107,8 +107,11 @@ function confirmReset() {
 
       <div class="toggles">
         <label><input v-model="config.shuffleQuestions" type="checkbox" /> 문제 순서 섞기</label>
-        <label><input v-model="config.shuffleChoices" type="checkbox" /> 보기 순서 섞기 <span class="muted">(순서·조합형 제외)</span></label>
+        <label v-if="exam.hasChoice"><input v-model="config.shuffleChoices" type="checkbox" /> 보기 순서 섞기 <span class="muted">(순서·조합형 제외)</span></label>
       </div>
+      <p v-if="exam.format !== '객관식'" class="muted hint">
+        단답·빈칸형은 띄어쓰기·대소문자를 무시하고 자동 채점합니다. 서술형은 모범답안의 핵심 요소로 스스로 채점합니다.
+      </p>
 
       <button type="button" class="btn primary wide" :disabled="!pickedCount" @click="emit('start', { ...config, sections: [...config.sections] })">
         {{ pickedCount ? `${pickedCount}문항 시작` : '고른 범위에 문제가 없습니다' }}

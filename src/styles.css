@@ -284,6 +284,53 @@ code, pre { font-family: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace
 }
 .q-explain strong { color: var(--good); }
 
+/* ───────── 주관식 ───────── */
+.q-card.partial { border-color: color-mix(in srgb, var(--warn) 50%, var(--line)); }
+.q-card.partial .q-verdict { color: var(--warn); }
+.sheet-cell.partial { background: color-mix(in srgb, var(--warn) 14%, var(--surface)); color: var(--warn); border-color: var(--warn); }
+.q-blanks { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.q-blank {
+  display: flex; align-items: center; gap: 8px; flex: 1 1 220px;
+  border: 1px solid var(--line); border-radius: 9px; padding: 4px 6px 4px 10px; background: var(--surface);
+}
+.q-blank:focus-within { border-color: var(--accent); }
+.q-blank.ok { border-color: var(--good); background: var(--good-soft); }
+.q-blank.ng { border-color: var(--bad); background: var(--bad-soft); }
+.q-blank-label { font-size: 13px; font-weight: 700; color: var(--accent); white-space: nowrap; }
+.q-blank input {
+  flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink);
+  font: inherit; font-size: 15.5px; padding: 6px 2px; outline: none;
+}
+.q-blank-mark { font-weight: 800; padding-right: 4px; }
+.q-blank.ok .q-blank-mark { color: var(--good); }
+.q-blank.ng .q-blank-mark { color: var(--bad); }
+.q-check { flex: none; }
+.q-hint { font-size: 12.5px; margin: 6px 0 0; }
+.q-answers { display: flex; flex-wrap: wrap; gap: 4px 12px; width: 100%; }
+.q-answers strong { color: var(--good); }
+.q-answer-item { font-weight: 600; }
+.q-answer-item .muted { font-weight: 400; font-size: 13px; }
+.q-essay {
+  width: 100%; font: inherit; font-size: 15px; line-height: 1.6; color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 9px; padding: 10px 12px; resize: vertical; margin-bottom: 8px;
+}
+.q-essay:focus { outline: none; border-color: var(--accent); }
+.q-essay:disabled { background: var(--surface-2); color: var(--ink); }
+.q-model { margin-top: 10px; padding: 12px 14px; border-radius: 9px; background: var(--surface-2); font-size: 14.5px; }
+.q-model-title { display: block; font-size: 13px; margin-bottom: 6px; color: var(--good); }
+.q-model-title .muted { font-weight: 500; }
+.q-points { margin-top: 12px; display: flex; flex-direction: column; gap: 4px; }
+.q-point {
+  display: flex; align-items: flex-start; gap: 8px; padding: 6px 8px; border-radius: 7px;
+  border: 1px solid var(--line); background: var(--surface); cursor: pointer;
+}
+.q-point.on { border-color: var(--good); background: var(--good-soft); }
+.q-point input { margin-top: 5px; }
+.q-point:has(input:disabled) { cursor: default; }
+.q-model .q-explain { background: transparent; padding: 8px 0 0; margin: 0; }
+.chips-inline { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+.chip.kind-written { background: var(--good-soft); color: var(--good); }
+
 /* ───────── 결과 ───────── */
 .score-card { display: flex; align-items: center; gap: 22px; }
 .score { font-size: 56px; font-weight: 800; color: var(--accent); line-height: 1; font-variant-numeric: tabular-nums; }

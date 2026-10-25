@@ -16,7 +16,10 @@ const pct = computed(() => Math.round((mastered.value / props.exam.count) * 100)
 <template>
   <RouterLink :to="examPath(exam)" class="exam-card">
     <div class="exam-card-top">
-      <span class="chip">{{ exam.course }}</span>
+      <span class="chips-inline">
+        <span class="chip">{{ exam.course }}</span>
+        <span class="chip" :class="exam.format === '객관식' ? 'kind-choice' : 'kind-written'">{{ exam.format }}</span>
+      </span>
       <span class="muted">{{ exam.count }}문항 · {{ exam.sections.length }}개 단원</span>
     </div>
     <h3>{{ exam.title }}</h3>

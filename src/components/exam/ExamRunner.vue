@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import QuestionCard from './QuestionCard.vue'
+import { isAnswered, isRevealedInPractice, scoreQuestion } from '../../lib/examSession.js'
 
 const props = defineProps({
   exam: { type: Object, required: true },
@@ -10,18 +11,22 @@ const emit = defineEmits(['answer', 'submit', 'quit'])
 
 const byId = computed(() => Object.fromEntries(props.exam.questions.map((q) => [q.id, q])))
 const practice = computed(() => props.session.mode === 'practice')
-const answered = computed(() => Object.keys(props.session.answers).length)
+const answerOf = (id) => props.session.answers[id]
+const revealedNow = (id) => practice.value && isRevealedInPractice(byId.value[id], answerOf(id))
+
+const answered = computed(() => props.session.items.filter(({ id }) => isAnswered(byId.value[id], answerOf(id))).length)
 const total = computed(() => props.session.items.length)
 const correctSoFar = computed(
-  () => props.session.items.filter(({ id }) => props.session.answers[id] === byId.value[id].answerIndex).length,
+  () => props.session.items.filter(({ id }) => revealedNow(id) && scoreQuestion(byId.value[id], answerOf(id)).credit === 1).length,
 )
 const showSheet = ref(false)
 
 function cellState(id) {
-  const chosen = props.session.answers[id]
-  if (chosen === undefined) return ''
-  if (!practice.value) return 'answered'
-  return chosen === byId.value[id].answerIndex ? 'correct' : 'wrong'
+  if (revealedNow(id)) {
+    const c = scoreQuestion(byId.value[id], answerOf(id)).credit
+    return c === 1 ? 'correct' : c === 0 ? 'wrong' : 'partial'
+  }
+  return isAnswered(byId.value[id], answerOf(id)) ? 'answered' : ''
 }
 
 function jump(n) {
@@ -31,7 +36,7 @@ function jump(n) {
 
 function submit() {
   const left = total.value - answered.value
-  if (left && !window.confirm(`아직 ${left}문항에 답하지 않았습니다. 답하지 않은 문항은 틀린 것으로 채점할까요?`)) return
+  if (left && !window.confirm(`아직 ${left}문항에 답하지 않았습니다. 답하지 않은 문항은 0점으로 채점할까요?`)) return
   emit('submit')
 }
 </script>
@@ -70,10 +75,12 @@ function submit() {
       :question="byId[item.id]"
       :number="i + 1"
       :order="item.order"
-      :chosen="session.answers[item.id]"
-      :revealed="practice && session.answers[item.id] !== undefined"
-      :locked="practice && session.answers[item.id] !== undefined"
-      @choose="(orig) => emit('answer', item.id, orig)"
+      :answer="answerOf(item.id)"
+      :revealed="revealedNow(item.id)"
+      :locked="revealedNow(item.id) && byId[item.id].kind !== 'essay'"
+      :can-reveal="practice"
+      :gradable="practice"
+      @answer="(a) => emit('answer', item.id, a)"
     />
 
     <div class="runner-end">
