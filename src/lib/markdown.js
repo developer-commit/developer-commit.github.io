@@ -87,5 +87,6 @@ export function renderMarkdown(text, { breaks = false } = {}) {
 /** 한 줄짜리 마크다운(시험 문항). 코드 블록·문단이 섞여 있으면 블록 렌더링으로 넘긴다. */
 export function renderInline(text) {
   const t = text ?? ''
-  return t.includes('```') || t.includes('\n\n') ? mdBreaks.render(t) : mdBreaks.renderInline(t)
+  const isBlock = t.includes('```') || t.includes('\n\n') || /^\s*\|.*\|\s*$/m.test(t) // 코드·문단·표
+  return isBlock ? mdBreaks.render(t) : mdBreaks.renderInline(t)
 }

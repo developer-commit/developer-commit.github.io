@@ -4,103 +4,306 @@
   "title": "블로그 객관식 시험",
   "description": "content/exams/<id>.json 의 형식. 자세한 작성 규칙은 docs/EXAM_GUIDE.md.",
   "type": "object",
-  "required": ["id", "title", "course", "description", "updated", "sections"],
+  "required": [
+    "id",
+    "title",
+    "course",
+    "description",
+    "updated",
+    "sections"
+  ],
   "additionalProperties": false,
   "properties": {
-    "$schema": { "type": "string" },
-    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$", "description": "URL에 쓰이는 시험 id. 파일 이름과 같아야 한다." },
-    "title": { "type": "string", "minLength": 1 },
-    "course": { "type": "string", "minLength": 1, "description": "과목·학기 등 짧은 출처 표시" },
-    "description": { "type": "string", "minLength": 1 },
-    "tags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
-    "updated": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "$schema": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "URL에 쓰이는 시험 id. 파일 이름과 같아야 한다."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "course": {
+      "type": "string",
+      "minLength": 1,
+      "description": "과목·학기 등 짧은 출처 표시"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "updated": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
     "sections": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["id", "title", "questions"],
+        "required": [
+          "id",
+          "title",
+          "questions"
+        ],
         "additionalProperties": false,
         "properties": {
-          "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$" },
-          "title": { "type": "string", "minLength": 1 },
-          "questions": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/question" } }
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "questions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/question"
+            }
+          }
         }
       }
     }
   },
   "$defs": {
-    "markdown": { "type": "string", "minLength": 1, "description": "마크다운. **굵게**, `코드`, ```코드 블록```, $수식$(KaTeX)" },
-    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$", "description": "시험 안에서 유일. 한번 정하면 바꾸지 않는다(풀이 기록의 키)." },
-    "typeTag": { "type": "string", "minLength": 1, "description": "유형 태그: 개념, 정의, 옳지 않은 것, 조합, 순서, 계산, 코드, 서술 …" },
+    "markdown": {
+      "type": "string",
+      "minLength": 1,
+      "description": "마크다운. **굵게**, `코드`, ```코드 블록```, $수식$(KaTeX)"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$",
+      "description": "시험 안에서 유일. 한번 정하면 바꾸지 않는다(풀이 기록의 키)."
+    },
+    "typeTag": {
+      "type": "string",
+      "minLength": 1,
+      "description": "유형 태그: 개념, 정의, 옳지 않은 것, 조합, 순서, 계산, 코드, 서술 …"
+    },
     "box": {
       "description": "보기 상자. 배열이면 ㄱ·ㄴ·ㄷ… 라벨이 자동으로 붙는다. 문자열이면 그대로(코드·그림용).",
       "oneOf": [
-        { "$ref": "#/$defs/markdown" },
-        { "type": "array", "minItems": 1, "maxItems": 8, "items": { "$ref": "#/$defs/markdown" } }
+        {
+          "$ref": "#/$defs/markdown"
+        },
+        {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "$ref": "#/$defs/markdown"
+          }
+        }
       ]
     },
     "question": {
       "description": "kind 로 종류를 고른다: choice(객관식, 생략 가능) · short(단답·빈칸, 자동 채점) · essay(서술, 자기 채점)",
-      "oneOf": [{ "$ref": "#/$defs/choiceQuestion" }, { "$ref": "#/$defs/shortQuestion" }, { "$ref": "#/$defs/essayQuestion" }]
+      "oneOf": [
+        {
+          "$ref": "#/$defs/choiceQuestion"
+        },
+        {
+          "$ref": "#/$defs/shortQuestion"
+        },
+        {
+          "$ref": "#/$defs/essayQuestion"
+        }
+      ]
     },
     "choiceQuestion": {
       "type": "object",
-      "required": ["id", "type", "prompt", "choices", "answer", "explanation"],
+      "required": [
+        "id",
+        "type",
+        "prompt",
+        "choices",
+        "answer",
+        "explanation"
+      ],
       "additionalProperties": false,
       "properties": {
-        "id": { "$ref": "#/$defs/id" },
-        "kind": { "const": "choice" },
-        "type": { "$ref": "#/$defs/typeTag" },
-        "prompt": { "$ref": "#/$defs/markdown" },
-        "box": { "$ref": "#/$defs/box" },
-        "choices": { "type": "array", "minItems": 2, "maxItems": 6, "items": { "$ref": "#/$defs/markdown" } },
-        "answer": { "type": "integer", "minimum": 1, "maximum": 6, "description": "정답 보기 번호. 1부터 센다 (1 = ①)." },
-        "fixedOrder": { "type": "boolean", "description": "true면 '보기 섞기'를 켜도 순서를 유지한다 (순서·조합·숫자 크기순 보기)." },
-        "explanation": { "$ref": "#/$defs/markdown" }
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "const": "choice"
+        },
+        "type": {
+          "$ref": "#/$defs/typeTag"
+        },
+        "points": {
+          "$ref": "#/$defs/points"
+        },
+        "prompt": {
+          "$ref": "#/$defs/markdown"
+        },
+        "box": {
+          "$ref": "#/$defs/box"
+        },
+        "choices": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 6,
+          "items": {
+            "$ref": "#/$defs/markdown"
+          }
+        },
+        "answer": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6,
+          "description": "정답 보기 번호. 1부터 센다 (1 = ①)."
+        },
+        "fixedOrder": {
+          "type": "boolean",
+          "description": "true면 '보기 섞기'를 켜도 순서를 유지한다 (순서·조합·숫자 크기순 보기)."
+        },
+        "explanation": {
+          "$ref": "#/$defs/markdown"
+        }
       }
     },
     "shortQuestion": {
       "type": "object",
-      "required": ["id", "kind", "type", "prompt", "blanks", "explanation"],
+      "required": [
+        "id",
+        "kind",
+        "type",
+        "prompt",
+        "blanks",
+        "explanation"
+      ],
       "additionalProperties": false,
       "properties": {
-        "id": { "$ref": "#/$defs/id" },
-        "kind": { "const": "short" },
-        "type": { "$ref": "#/$defs/typeTag" },
-        "prompt": { "$ref": "#/$defs/markdown", "description": "빈칸이 여러 개면 본문에 **(1)**, **(2)** 처럼 표시한다." },
-        "box": { "$ref": "#/$defs/box" },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "const": "short"
+        },
+        "type": {
+          "$ref": "#/$defs/typeTag"
+        },
+        "points": {
+          "$ref": "#/$defs/points"
+        },
+        "prompt": {
+          "$ref": "#/$defs/markdown",
+          "description": "빈칸이 여러 개면 본문에 **(1)**, **(2)** 처럼 표시한다."
+        },
+        "box": {
+          "$ref": "#/$defs/box"
+        },
         "blanks": {
           "type": "array",
           "minItems": 1,
           "maxItems": 10,
           "description": "빈칸마다 허용 답안 배열. 첫 번째가 화면에 보일 대표 정답. 띄어쓰기·대소문자·하이픈은 자동으로 무시한다.",
-          "items": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
         },
-        "anyOrder": { "type": "boolean", "description": "true면 빈칸을 순서와 상관없이 채점한다 (\"세 가지를 쓰시오\")." },
-        "explanation": { "$ref": "#/$defs/markdown" }
+        "anyOrder": {
+          "type": "boolean",
+          "description": "true면 빈칸을 순서와 상관없이 채점한다 (\"세 가지를 쓰시오\")."
+        },
+        "explanation": {
+          "$ref": "#/$defs/markdown"
+        }
       }
     },
     "essayQuestion": {
       "type": "object",
-      "required": ["id", "kind", "type", "prompt", "modelAnswer", "keyPoints"],
+      "required": [
+        "id",
+        "kind",
+        "type",
+        "prompt",
+        "modelAnswer",
+        "keyPoints"
+      ],
       "additionalProperties": false,
       "properties": {
-        "id": { "$ref": "#/$defs/id" },
-        "kind": { "const": "essay" },
-        "type": { "$ref": "#/$defs/typeTag" },
-        "prompt": { "$ref": "#/$defs/markdown" },
-        "box": { "$ref": "#/$defs/box" },
-        "modelAnswer": { "$ref": "#/$defs/markdown", "description": "모범답안. 채점할 때 사용자에게 보여 준다." },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "const": "essay"
+        },
+        "type": {
+          "$ref": "#/$defs/typeTag"
+        },
+        "points": {
+          "$ref": "#/$defs/points"
+        },
+        "prompt": {
+          "$ref": "#/$defs/markdown"
+        },
+        "box": {
+          "$ref": "#/$defs/box"
+        },
+        "modelAnswer": {
+          "$ref": "#/$defs/markdown",
+          "description": "모범답안. 채점할 때 사용자에게 보여 준다."
+        },
         "keyPoints": {
           "type": "array",
           "minItems": 1,
           "maxItems": 8,
-          "description": "채점 핵심 요소. 사용자가 자기 답에 들어간 요소를 체크하면 체크 비율이 점수가 된다.",
-          "items": { "$ref": "#/$defs/markdown" }
+          "description": "채점 핵심 요소. 문자열이면 요소마다 1점, {text, points}면 요소별 배점. 사용자가 체크한 요소의 배점 비율이 점수가 된다.",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/markdown"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "text",
+                  "points"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "$ref": "#/$defs/markdown"
+                  },
+                  "points": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              }
+            ]
+          }
         },
-        "explanation": { "$ref": "#/$defs/markdown", "description": "선택. 모범답안 아래에 덧붙일 보충 설명." }
+        "explanation": {
+          "$ref": "#/$defs/markdown",
+          "description": "선택. 모범답안 아래에 덧붙일 보충 설명."
+        }
       }
+    },
+    "points": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "배점. 생략하면 1. 시험 점수는 (받은 점수 합 / 배점 합) × 100."
     }
   }
 }

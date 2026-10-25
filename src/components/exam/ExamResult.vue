@@ -31,7 +31,10 @@ const verdict = computed(() => {
     <section class="card score-card">
       <div class="score">{{ result.score }}<small>점</small></div>
       <div>
-        <p class="score-line">{{ result.total }}문항 중 <strong>{{ result.correct }}</strong>문항 정답</p>
+        <p v-if="result.weighted" class="score-line">
+          배점 <strong>{{ result.earned }}</strong> / {{ result.possible }}점 · {{ result.total }}문항 중 {{ result.correct }}문항 만점
+        </p>
+        <p v-else class="score-line">{{ result.total }}문항 중 <strong>{{ result.correct }}</strong>문항 정답</p>
         <p class="muted">
           오답 {{ wrongOnly }}<template v-if="result.partial"> · 부분 정답 {{ result.partial }}</template> · 미응답 {{ result.unanswered }}
         </p>
@@ -43,8 +46,11 @@ const verdict = computed(() => {
       <h2>단원별</h2>
       <div v-for="s in result.sections" :key="s.id" class="section-row static">
         <span class="section-name">{{ s.title }}</span>
-        <span class="section-bar" :class="{ low: s.credit / s.total < 0.7 }"><span :style="{ width: (s.credit / s.total) * 100 + '%' }" /></span>
-        <span class="muted section-count">{{ Math.round((s.credit / s.total) * 100) }}점</span>
+        <span class="section-bar" :class="{ low: s.earned / s.possible < 0.7 }"><span :style="{ width: (s.earned / s.possible) * 100 + '%' }" /></span>
+        <span class="muted section-count">
+          <template v-if="result.weighted">{{ Math.round(s.earned * 10) / 10 }}/{{ s.possible }}</template>
+          <template v-else>{{ Math.round((s.earned / s.possible) * 100) }}점</template>
+        </span>
       </div>
     </section>
 

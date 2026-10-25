@@ -7,5 +7,6 @@
 - 완성 예시
   - 객관식: [`blockchain-2026-2.json`](./blockchain-2026-2.json) (블록체인 1–9강, 242문항)
   - 주관식: [`blockchain-2026-2-subjective.json`](./blockchain-2026-2-subjective.json) (단답·빈칸 107 + 서술 26문항)
+  - 실전형 혼합(배점 있음): [`blockchain-2026-2-mock-1.json`](./blockchain-2026-2-mock-1.json), [`-mock-2.json`](./blockchain-2026-2-mock-2.json) (객관식 20 + 단답 30 + 서술 50 = 100점)
 
 추가한 뒤에는 `npm run validate`로 검사한다.

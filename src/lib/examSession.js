@@ -95,27 +95,40 @@ export function scoreQuestion(q, a) {
     const blanks = gradeBlanks(q.blanks, a?.values || [], q.anyOrder)
     return { credit: blanks.filter(Boolean).length / q.blanks.length, blanks }
   }
+  // 핵심 요소마다 배점이 다를 수 있다 (채점 기준 "2점·2점·4점" 등)
   const points = q.keyPoints.map((_, i) => Boolean(a?.points?.[i]))
-  return { credit: points.filter(Boolean).length / q.keyPoints.length, points }
+  const max = q.keyPoints.reduce((sum, p) => sum + p.points, 0)
+  const got = q.keyPoints.reduce((sum, p, i) => sum + (points[i] ? p.points : 0), 0)
+  return { credit: got / max, points }
 }
 
-/** 채점. 답하지 않은 문항은 0점. 단답 빈칸·서술 요소는 부분 점수. */
+/**
+ * 채점. 답하지 않은 문항은 0점. 단답 빈칸·서술 요소는 부분 점수.
+ * 문항 점수 = credit(0–1) × 배점(points). 총점은 100점 만점으로 환산한다.
+ */
 export function grade(exam, session) {
   const byId = Object.fromEntries(exam.questions.map((q) => [q.id, q]))
   const results = session.items.map(({ id }) => {
     const q = byId[id]
     const chosen = session.answers[id]
     const { credit } = scoreQuestion(q, chosen)
-    return { id, question: q, chosen, answered: isAnswered(q, chosen), credit, correct: credit === 1 }
+    return {
+      id, question: q, chosen, answered: isAnswered(q, chosen), credit, correct: credit === 1,
+      earned: credit * q.points,
+    }
   })
+  const sum = (rs, f) => rs.reduce((acc, r) => acc + f(r), 0)
   const sections = exam.sections
     .map((s) => {
       const rs = results.filter((r) => r.question.sectionId === s.id)
-      const credit = rs.reduce((sum, r) => sum + r.credit, 0)
-      return { id: s.id, title: s.title, total: rs.length, correct: rs.filter((r) => r.correct).length, credit }
+      return {
+        id: s.id, title: s.title, total: rs.length, correct: rs.filter((r) => r.correct).length,
+        earned: sum(rs, (r) => r.earned), possible: sum(rs, (r) => r.question.points),
+      }
     })
     .filter((s) => s.total > 0)
-  const credit = results.reduce((sum, r) => sum + r.credit, 0)
+  const earned = sum(results, (r) => r.earned)
+  const possible = sum(results, (r) => r.question.points)
   return {
     results,
     sections,
@@ -123,6 +136,9 @@ export function grade(exam, session) {
     correct: results.filter((r) => r.correct).length,
     partial: results.filter((r) => r.credit > 0 && r.credit < 1).length,
     unanswered: results.filter((r) => !r.answered).length,
-    score: results.length ? Math.round((credit / results.length) * 100) : 0,
+    earned: Math.round(earned * 10) / 10,
+    possible,
+    weighted: exam.weighted,
+    score: possible ? Math.round((earned / possible) * 100) : 0,
   }
 }

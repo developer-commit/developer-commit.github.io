@@ -29,9 +29,16 @@ const verdict = computed(() => {
   const { credit, blanks, points } = score.value
   if (credit === 1) return '정답'
   if (credit === 0) return '오답'
+  // 배점이 있는 문항은 받은 점수로, 아니면 맞힌 칸·요소 수로 보여 준다
+  if (q.value.points !== 1) return `부분 점수 ${Math.round(credit * q.value.points * 10) / 10}/${q.value.points}`
   const parts = blanks || points
   return `부분 정답 ${parts.filter(Boolean).length}/${parts.length}`
 })
+const essayGot = computed(() =>
+  q.value.kind === 'essay' ? q.value.keyPoints.reduce((s, p, i) => s + (score.value.points[i] ? p.points : 0), 0) : 0,
+)
+const essayMax = computed(() => (q.value.kind === 'essay' ? q.value.keyPoints.reduce((s, p) => s + p.points, 0) : 0))
+const weightedPoints = computed(() => q.value.kind === 'essay' && q.value.keyPoints.some((p) => p.points !== 1))
 
 // ── 객관식 ──
 function choiceClass(orig) {
@@ -78,6 +85,7 @@ function togglePoint(i) {
       <span class="q-num">{{ number }}</span>
       <span class="q-type">{{ question.type }}</span>
       <span class="q-section muted">{{ question.sectionTitle }}</span>
+      <span v-if="question.points !== 1" class="q-points-tag">{{ question.points }}점</span>
       <span v-if="revealed" class="q-verdict">{{ verdict }}</span>
     </header>
 
@@ -174,11 +182,16 @@ function togglePoint(i) {
         <MarkdownText :text="question.modelAnswer" block breaks />
         <div class="q-points">
           <strong class="q-model-title">
-            핵심 요소 <span class="muted">— 내 답에 들어간 것을 체크 ({{ score.points.filter(Boolean).length }}/{{ question.keyPoints.length }})</span>
+            {{ weightedPoints ? '채점 기준' : '핵심 요소' }}
+            <span class="muted">
+              — 내 답에 들어간 것을 체크
+              ({{ weightedPoints ? `${essayGot}/${essayMax}점` : `${score.points.filter(Boolean).length}/${question.keyPoints.length}` }})
+            </span>
           </strong>
           <label v-for="(p, i) in question.keyPoints" :key="i" class="q-point" :class="{ on: score.points[i] }">
             <input type="checkbox" :checked="score.points[i]" :disabled="!gradable" @change="togglePoint(i)" />
-            <MarkdownText :text="p" tag="span" />
+            <MarkdownText :text="p.text" tag="span" />
+            <span v-if="weightedPoints" class="q-point-score">{{ p.points }}점</span>
           </label>
         </div>
         <MarkdownText v-if="question.explanation" :text="question.explanation" class="q-explain" />

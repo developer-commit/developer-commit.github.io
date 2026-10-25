@@ -15,7 +15,7 @@ const ID = /^[a-z0-9][a-z0-9-]*$/
 const QID = /^[A-Za-z0-9][A-Za-z0-9_-]*$/
 const DATE = /^\d{4}-\d{2}-\d{2}$/
 const TOP_KEYS = new Set(['$schema', 'id', 'title', 'course', 'description', 'tags', 'updated', 'sections'])
-const Q_KEYS = new Set(['id', 'kind', 'type', 'prompt', 'box', 'choices', 'answer', 'fixedOrder', 'blanks', 'anyOrder', 'modelAnswer', 'keyPoints', 'explanation'])
+const Q_KEYS = new Set(['id', 'kind', 'type', 'points', 'prompt', 'box', 'choices', 'answer', 'fixedOrder', 'blanks', 'anyOrder', 'modelAnswer', 'keyPoints', 'explanation'])
 const KINDS = new Set(['choice', 'short', 'essay'])
 // 한 종류의 문항에서만 쓰는 필드
 const KIND_ONLY = {
@@ -25,6 +25,7 @@ const KIND_ONLY = {
 }
 
 const nonEmpty = (v) => typeof v === 'string' && v.trim().length > 0
+const isPositive = (v) => typeof v === 'number' && Number.isFinite(v) && v > 0
 
 // 마크다운 문자열 안의 $수식$ 이 KaTeX로 그려지는지, ``` 가 짝이 맞는지 확인
 function checkMarkdown(where, text) {
@@ -149,10 +150,21 @@ for (const file of readdirSync(dir).sort()) {
       if (kind === 'essay') {
         if (!nonEmpty(q.modelAnswer)) err(qw, '"modelAnswer"(모범답안) 이 비어 있습니다')
         else checkMarkdown(`${qw} › modelAnswer`, q.modelAnswer)
-        if (!Array.isArray(q.keyPoints) || q.keyPoints.length < 1 || q.keyPoints.length > 8 || !q.keyPoints.every(nonEmpty)) {
-          err(qw, '"keyPoints"(채점 핵심 요소) 는 비어 있지 않은 문자열 1–8개')
-        } else q.keyPoints.forEach((p, pi) => checkMarkdown(`${qw} › keyPoints[${pi}]`, p))
+        // 핵심 요소: 문자열(1점) 또는 { "text": "...", "points": 배점 }
+        const isPoint = (p) => nonEmpty(p) || (p && typeof p === 'object' && nonEmpty(p.text) && isPositive(p.points))
+        if (!Array.isArray(q.keyPoints) || q.keyPoints.length < 1 || q.keyPoints.length > 8 || !q.keyPoints.every(isPoint)) {
+          err(qw, '"keyPoints"(채점 핵심 요소) 는 1–8개. 각 요소는 문자열 또는 {"text": "...", "points": 양수}')
+        } else {
+          q.keyPoints.forEach((p, pi) => checkMarkdown(`${qw} › keyPoints[${pi}]`, typeof p === 'string' ? p : p.text))
+          const weighted = q.keyPoints.some((p) => typeof p === 'object')
+          const sum = q.keyPoints.reduce((s, p) => s + (typeof p === 'object' ? p.points : 1), 0)
+          if (weighted && q.points !== undefined && Math.abs(sum - q.points) > 1e-9) {
+            warn(qw, `keyPoints 배점 합(${sum})이 문항 배점 points(${q.points})와 다릅니다 — 받은 비율로 환산됩니다`)
+          }
+        }
       }
+
+      if (q.points !== undefined && !isPositive(q.points)) err(qw, '"points"(배점) 는 0보다 큰 수')
 
       if (q.box !== undefined) {
         if (Array.isArray(q.box)) {
