@@ -1,0 +1,1530 @@
+{
+  "$schema": "./exam.schema.json",
+  "id": "machine-learning-2026-2-code",
+  "title": "머신러닝응용 실습코드 암기 · 객관식",
+  "course": "머신러닝응용 · 2026-2학기",
+  "description": "실습 코드에서 반복되는 12개 패턴(읽기·정제·특징·분할·학습·스케일링·IQR·원-핫·다항·교차검증·탐색·조기 종료)과 모델 생성자·파라미터·평가 함수를 객관식으로 외운다. 오답 보기는 틀리기 쉬운 인자 이름·순서·메서드로 만들었다.",
+  "tags": [
+    "머신러닝",
+    "실습코드",
+    "sklearn",
+    "pandas",
+    "암기"
+  ],
+  "updated": "2026-10-27",
+  "sections": [
+    {
+      "id": "D1",
+      "title": "① 데이터 읽기·확인·통계",
+      "questions": [
+        {
+          "id": "D1-01",
+          "type": "코드",
+          "prompt": "CSV 파일 `data.csv`를 DataFrame으로 읽는 코드는?",
+          "choices": [
+            "`df = pd.load_csv(\"data.csv\")`",
+            "`df = pd.DataFrame(\"data.csv\")`",
+            "`df = np.read_csv(\"data.csv\")`",
+            "`df = pd.read_csv(\"data.csv\")`"
+          ],
+          "answer": 4,
+          "explanation": "pandas의 `read_csv`가 파일을 읽어 DataFrame을 돌려준다. `load_csv`라는 함수는 없고, `pd.DataFrame(\"data.csv\")`는 파일을 읽지 않고 오류를 낸다."
+        },
+        {
+          "id": "D1-02",
+          "type": "코드",
+          "prompt": "수치형 열마다 개수·평균·표준편차·최솟값·사분위수·최댓값을 한 표로 보고, 소수 둘째 자리로 반올림하는 코드는?",
+          "choices": [
+            "`df.info().round(2)`",
+            "`df.describe().round(2)`",
+            "`df.describe(2)`",
+            "`df.summary().round(2)`"
+          ],
+          "answer": 2,
+          "explanation": "`describe()`가 기초 통계 표(count, mean, std, min, 25%, 50%, 75%, max)를 만들고 `.round(2)`가 반올림한다. `info()`는 열 타입과 결측 아닌 개수를 **출력만** 하고 None을 돌려주므로 `.round`를 이어 붙일 수 없다."
+        },
+        {
+          "id": "D1-03",
+          "type": "코드",
+          "prompt": "열별 결측 **개수**를 구하는 코드는?",
+          "choices": [
+            "`df.isna().sum()`",
+            "`df.isna().count()`",
+            "`df.isna().mean()`",
+            "`df.dropna().sum()`"
+          ],
+          "answer": 1,
+          "explanation": "`isna()`는 결측이면 True인 같은 모양의 표를 만들고, True = 1이므로 열 방향 합이 결측 개수다. `count()`는 True/False를 가리지 않고 값의 개수(= 행 수)를 세고, `mean()`은 비율이다."
+        },
+        {
+          "id": "D1-04",
+          "type": "코드",
+          "prompt": "열별 결측 **비율(%)**을 소수 둘째 자리까지 구하는 코드는?",
+          "choices": [
+            "`(df.isna().sum() * 100).round(2)`",
+            "`(df.isna().mean() / 100).round(2)`",
+            "`(df.isna().mean() * 100).round(2)`",
+            "`(df.mean().isna() * 100).round(2)`"
+          ],
+          "answer": 3,
+          "explanation": "True/False의 평균은 True의 비율(0–1)이므로 100을 곱하면 %가 된다. `sum()`에 100을 곱하면 개수 × 100이다. 괄호로 곱셈을 먼저 묶은 뒤 `round(2)`를 적용한다."
+        },
+        {
+          "id": "D1-05",
+          "type": "코드",
+          "prompt": "`col` 값이 같은 행끼리 묶어 `value` 열의 평균을 구하는 코드는?",
+          "choices": [
+            "`df.groupby(\"value\")[\"col\"].mean()`",
+            "`df.groupby(\"col\")[\"value\"].mean()`",
+            "`df[\"value\"].mean().groupby(\"col\")`",
+            "`df.groupby([\"col\", \"value\"]).mean()`"
+          ],
+          "answer": 2,
+          "explanation": "`groupby(기준 열)`로 묶고 `[집계할 열]`을 고른 뒤 `.mean()`으로 그룹별 평균을 낸다. 기준과 집계 대상의 자리를 바꾸면 전혀 다른 표가 되고, 두 열을 모두 기준으로 넣으면 `value`도 묶는 기준이 되어 버린다."
+        },
+        {
+          "id": "D1-06",
+          "type": "코드",
+          "prompt": "`df.groupby(\"col\")[\"value\"].mean()` 뒤에 붙여 그룹별 평균을 **큰 값부터** 정렬하는 코드는?",
+          "choices": [
+            "`.sort_values(descending=True)`",
+            "`.sort_values(reverse=True)`",
+            "`.sort_values(ascending=False)`",
+            "`.sort_index(ascending=False)`"
+          ],
+          "answer": 3,
+          "explanation": "pandas 정렬은 `ascending` 인자 하나로 방향을 정한다(기본 True = 오름차순). `sort_index`는 값이 아니라 그룹 이름(인덱스) 순으로 정렬한다."
+        },
+        {
+          "id": "D1-07",
+          "type": "옳지 않은 것",
+          "prompt": "데이터 확인 코드에 대한 설명으로 옳지 **않은** 것은?",
+          "choices": [
+            "`df.isna()`는 결측이면 True인, `df`와 같은 모양의 표를 만든다",
+            "`df.isna().mean()`은 열마다 결측 비율을 0–1 사이 값으로 준다",
+            "`df.groupby(\"col\")[\"value\"].mean()`의 결과는 `col`의 값을 인덱스로 가진다",
+            "`df.describe()`는 기본으로 문자열(범주형) 열의 통계만 보여 준다"
+          ],
+          "answer": 4,
+          "explanation": "`describe()`는 기본으로 **수치형** 열만 요약한다. 결측표의 합은 개수, 평균은 비율이고, groupby 결과는 묶은 기준값이 인덱스가 된다."
+        }
+      ]
+    },
+    {
+      "id": "D2",
+      "title": "② 데이터 정제",
+      "questions": [
+        {
+          "id": "D2-01",
+          "type": "코드",
+          "prompt": "모든 열 값이 같은 중복 행을 지우고 인덱스를 0부터 다시 매기는 코드는?",
+          "choices": [
+            "`df.drop_duplicates().reset_index(drop=True)`",
+            "`df.drop_duplicates().reset_index(drop=False)`",
+            "`df.duplicated().reset_index(drop=True)`",
+            "`df.dropna().reset_index(drop=True)`"
+          ],
+          "answer": 1,
+          "explanation": "`drop_duplicates()`가 중복 행을 지우고, 지운 자리 때문에 듬성듬성해진 인덱스를 `reset_index(drop=True)`가 0부터 다시 매긴다. `duplicated()`는 행마다 중복 여부(True/False)만 표시하고 지우지 않는다."
+        },
+        {
+          "id": "D2-02",
+          "type": "개념",
+          "prompt": "`reset_index(drop=True)`에서 `drop=True`의 역할은?",
+          "choices": [
+            "중복된 행을 찾아 인덱스와 함께 지운다",
+            "기존 인덱스를 새 열로 남기지 않고 버린다",
+            "결측이 있는 행을 인덱스와 함께 지운다",
+            "인덱스를 큰 값부터 거꾸로 다시 매긴다"
+          ],
+          "answer": 2,
+          "explanation": "`drop=False`(기본)이면 기존 인덱스가 `index`라는 열로 데이터에 끼어든다. 인덱스 번호만 새로 매기려면 `drop=True`."
+        },
+        {
+          "id": "D2-03",
+          "type": "코드",
+          "prompt": "`col`이 음수인 칸(센서 오류 코드 −99 등)만 결측으로 바꾸는 코드는?",
+          "choices": [
+            "`df.loc[df[\"col\"] < 0, \"col\"] = np.nan`",
+            "`df.loc[\"col\", df[\"col\"] < 0] = np.nan`",
+            "`df.loc[df[\"col\"] < 0] = np.nan`",
+            "`df.iloc[df[\"col\"] < 0, \"col\"] = np.nan`"
+          ],
+          "answer": 1,
+          "explanation": "`loc[행 조건, 열 이름]` 순서다. 열 이름을 빼면 조건에 맞는 행의 **모든 열**이 NaN이 되고, `iloc`은 정수 위치만 받으므로 열 이름을 쓸 수 없다."
+        },
+        {
+          "id": "D2-04",
+          "type": "코드",
+          "prompt": "시간 순서가 있는 열의 결측을 앞뒤 값 사이의 직선으로 메우는 코드는?",
+          "choices": [
+            "`df[\"col\"].fillna(df[\"col\"].median())`",
+            "`df[\"col\"].dropna()`",
+            "`df[\"col\"].fillna(0)`",
+            "`df[\"col\"].interpolate()`"
+          ],
+          "answer": 4,
+          "explanation": "`interpolate()`는 기본으로 선형 보간 — 결측 양옆 값을 직선으로 이어 채운다. 시간 순서가 의미 있는 기온 같은 열에 쓰므로, 먼저 시간순으로 정렬해 둔다."
+        },
+        {
+          "id": "D2-05",
+          "type": "코드",
+          "prompt": "결측을 그 열의 중앙값으로 채우는 코드는?",
+          "choices": [
+            "`df[\"col\"].fillna(\"median\")`",
+            "`df[\"col\"].median().fillna()`",
+            "`df[\"col\"].fillna(df[\"col\"].median())`",
+            "`df[\"col\"].interpolate(df[\"col\"].median())`"
+          ],
+          "answer": 3,
+          "explanation": "`fillna(값)`은 결측 자리를 그 값으로 채운다. 채울 값을 `df[\"col\"].median()`으로 먼저 계산해 넘긴다. 문자열 \"median\"을 넘기면 결측이 글자 그대로 채워진다."
+        },
+        {
+          "id": "D2-06",
+          "type": "코드",
+          "prompt": "`col`이 결측인 **행**만 지우는 코드는?",
+          "choices": [
+            "`df.dropna(columns=[\"col\"])`",
+            "`df.drop(columns=[\"col\"])`",
+            "`df.dropna(axis=\"col\")`",
+            "`df.dropna(subset=[\"col\"])`"
+          ],
+          "answer": 4,
+          "explanation": "`dropna`에서 어느 열의 결측을 볼지는 `subset`으로 정한다. `drop(columns=[...])`는 결측과 상관없이 그 **열 자체**를 지우고, `dropna`에는 `columns` 인자가 없다."
+        },
+        {
+          "id": "D2-07",
+          "type": "코드",
+          "prompt": "`col` 기준으로 정렬한 뒤 인덱스를 0부터 다시 매기는 코드는?",
+          "choices": [
+            "`df.reset_index(drop=True).sort_values(\"col\")`",
+            "`df.sort_index(\"col\").reset_index(drop=True)`",
+            "`df.sort_values(\"col\").reset_index(drop=True)`",
+            "`df.sort(\"col\").reset_index(drop=True)`"
+          ],
+          "answer": 3,
+          "explanation": "정렬하면 행 순서만 바뀌고 인덱스는 원래 번호를 그대로 달고 다닌다. 정렬 **뒤에** `reset_index(drop=True)`를 해야 0, 1, 2…가 된다. 순서를 바꾸면 번호를 매긴 뒤 다시 섞는 셈이다."
+        },
+        {
+          "id": "D2-08",
+          "type": "코드",
+          "prompt": "상한 `upper`를 넘는 값을 지우지 않고 `upper`로 바꾸는 코드는?",
+          "choices": [
+            "`df[\"col\"].clip(upper=upper)`",
+            "`df[\"col\"].clip(lower=upper)`",
+            "`df[\"col\"].clip(max=upper)`",
+            "`df[df[\"col\"] <= upper]`"
+          ],
+          "answer": 1,
+          "explanation": "`clip(upper=u)`는 u보다 큰 값을 u로 깎고 행은 남긴다. `lower=`는 하한, `max=`라는 인자는 없다. `df[df[\"col\"] <= upper]`는 그 행을 지운다."
+        },
+        {
+          "id": "D2-09",
+          "type": "조합",
+          "prompt": "정제 코드에 대한 설명으로 옳은 것만을 「보기」에서 모두 고른 것은?",
+          "box": [
+            "`drop_duplicates()`는 모든 열 값이 같은 행들 중 첫 행만 남긴다",
+            "`dropna(subset=[\"col\"])`은 `col` 열 자체를 지운다",
+            "`clip(upper=u)`는 u를 넘는 행을 지운다",
+            "`interpolate()`는 결측 앞뒤 값 사이를 직선으로 채운다"
+          ],
+          "choices": [
+            "ㄱ, ㄴ",
+            "ㄱ, ㄹ",
+            "ㄴ, ㄷ",
+            "ㄷ, ㄹ"
+          ],
+          "answer": 2,
+          "fixedOrder": true,
+          "explanation": "`dropna(subset=[\"col\"])`은 `col`이 결측인 **행**을 지우고(열은 남음), `clip(upper=u)`는 행을 남긴 채 값을 u로 깎는다."
+        }
+      ]
+    },
+    {
+      "id": "D3",
+      "title": "③ 날짜·특징 생성",
+      "questions": [
+        {
+          "id": "D3-01",
+          "type": "코드",
+          "prompt": "문자열로 읽힌 날짜 열 `date`를 날짜 타입으로 바꾸는 코드는?",
+          "choices": [
+            "`df[\"date\"] = df[\"date\"].to_datetime()`",
+            "`df[\"date\"] = pd.to_datetime(df[\"date\"])`",
+            "`df[\"date\"] = pd.datetime(df[\"date\"])`",
+            "`df[\"date\"] = df[\"date\"].dt.date`"
+          ],
+          "answer": 2,
+          "explanation": "`to_datetime`은 pandas 최상위 함수(`pd.`)다. 날짜 타입이 되어야 `.dt` 접근자로 월·시간·요일을 꺼낼 수 있다."
+        },
+        {
+          "id": "D3-02",
+          "type": "코드",
+          "prompt": "날짜 열에서 **월**을 꺼내는 코드는?",
+          "choices": [
+            "`df[\"date\"].month`",
+            "`df[\"date\"].dt.month()`",
+            "`df[\"date\"].dt.month`",
+            "`df[\"date\"].dt.months`"
+          ],
+          "answer": 3,
+          "explanation": "Series의 날짜 정보는 `.dt` 접근자를 거쳐 꺼낸다. `month`, `hour`, `dayofweek`는 괄호 없는 속성이다."
+        },
+        {
+          "id": "D3-03",
+          "type": "코드",
+          "prompt": "날짜 열에서 **시각(0–23)**을 정수로 꺼내는 코드는?",
+          "choices": [
+            "`df[\"date\"].dt.hour`",
+            "`df[\"date\"].dt.time`",
+            "`df[\"date\"].dt.hours`",
+            "`df[\"date\"].hour`"
+          ],
+          "answer": 1,
+          "explanation": "`hour`는 0–23 정수다. `time`은 시:분:초 객체 전체라 숫자 특징으로 바로 쓸 수 없다."
+        },
+        {
+          "id": "D3-04",
+          "type": "숫자",
+          "prompt": "`df[\"date\"].dt.dayofweek`가 **일요일**에 돌려주는 값은?",
+          "choices": [
+            "0",
+            "1",
+            "6",
+            "7"
+          ],
+          "answer": 3,
+          "fixedOrder": true,
+          "explanation": "월요일 = 0 … 일요일 = 6. 그래서 주말 여부는 `(df[\"요일\"] >= 5).astype(int)`로 만든다."
+        },
+        {
+          "id": "D3-05",
+          "type": "코드",
+          "prompt": "`col`이 0보다 크면 1, 아니면 0인 열을 만드는 코드는?",
+          "choices": [
+            "`df[\"flag\"] = df[\"col\"].astype(int) > 0`",
+            "`df[\"flag\"] = (df[\"col\"] > 0).astype(int)`",
+            "`df[\"flag\"] = int(df[\"col\"] > 0)`",
+            "`df[\"flag\"] = (df[\"col\"] > 0).astype(bool)`"
+          ],
+          "answer": 2,
+          "explanation": "비교 결과(True/False)를 `astype(int)`로 1/0으로 바꾼다. 정수 변환 뒤에 비교하면 결과가 다시 True/False이고, `int(Series)`는 Series 전체를 정수 하나로 바꾸려다 오류가 난다."
+        },
+        {
+          "id": "D3-06",
+          "type": "코드",
+          "prompt": "`col`이 1, 2, 3 중 하나이면 1, 아니면 0인 열을 만드는 코드는?",
+          "choices": [
+            "`df[\"flag\"] = df[\"col\"].isin(1, 2, 3).astype(int)`",
+            "`df[\"flag\"] = (df[\"col\"] in [1, 2, 3]).astype(int)`",
+            "`df[\"flag\"] = df[\"col\"].contains([1, 2, 3]).astype(int)`",
+            "`df[\"flag\"] = df[\"col\"].isin([1, 2, 3]).astype(int)`"
+          ],
+          "answer": 4,
+          "explanation": "`isin`은 후보를 **리스트 하나**로 받아 원소마다 포함 여부를 돌려준다. 파이썬의 `in`은 Series 전체의 참·거짓을 하나로 정할 수 없어 오류가 난다."
+        }
+      ]
+    },
+    {
+      "id": "D4",
+      "title": "④⑤ 분할·학습·예측",
+      "questions": [
+        {
+          "id": "D4-01",
+          "type": "코드",
+          "prompt": "`train_test_split(X, y, test_size=0.2, random_state=42)`의 반환값을 받는 순서로 옳은 것은?",
+          "choices": [
+            "`X_tr, y_tr, X_te, y_te`",
+            "`X_tr, X_te, y_te, y_tr`",
+            "`X_tr, X_te, y_tr, y_te`",
+            "`X_te, X_tr, y_te, y_tr`"
+          ],
+          "answer": 3,
+          "explanation": "넘긴 배열 순서대로 (훈련, 테스트) 쌍이 나온다 — X의 훈련·테스트, 그다음 y의 훈련·테스트."
+        },
+        {
+          "id": "D4-02",
+          "type": "개념",
+          "prompt": "`test_size=0.2`, `random_state=42`의 뜻으로 옳은 것은?",
+          "choices": [
+            "테스트 행 20개를 떼고, 42번 섞어 평균을 낸다",
+            "훈련 데이터의 20%를 검증으로 떼고, 42번째 행부터 나눈다",
+            "전체의 20%를 테스트로 떼고, 실행할 때마다 다른 행이 뽑히게 한다",
+            "전체의 20%를 테스트로 떼고, 실행할 때마다 같은 분할이 나오게 한다"
+          ],
+          "answer": 4,
+          "explanation": "0–1 사이 실수면 비율, 정수면 행 개수다. `random_state`는 무작위 섞기의 시드라, 고정하면 실행마다 같은 분할이 나와 결과를 재현·비교할 수 있다."
+        },
+        {
+          "id": "D4-03",
+          "type": "코드",
+          "prompt": "특징 이름 리스트 `features`와 타깃 이름 `target`으로 입력과 정답을 나누는 코드는?",
+          "choices": [
+            "`X = df[features]`, `y = df[target]`",
+            "`X = df[target]`, `y = df[features]`",
+            "`X = df[[features]]`, `y = df[[target]]`",
+            "`X = df.features`, `y = df.target`"
+          ],
+          "answer": 1,
+          "explanation": "`features`가 이미 리스트라 `df[features]`는 여러 열의 DataFrame, `target`은 문자열이라 `df[target]`은 Series가 된다. 리스트를 한 번 더 감싸면 오류다."
+        },
+        {
+          "id": "D4-04",
+          "type": "코드",
+          "prompt": "train과 test가 **이미 나뉜** 파일로 주어졌을 때, 테스트 입력과 정답을 만드는 코드는?",
+          "choices": [
+            "`X_te, y_te = train[features], train[target]`",
+            "`X_te, y_te = test[features], test[target]`",
+            "`X_te, y_te = test[target], test[features]`",
+            "`X_tr, X_te, y_tr, y_te = train_test_split(test)`"
+          ],
+          "answer": 2,
+          "explanation": "이미 나뉜 경우에는 `train_test_split`을 다시 쓰지 않고, 각 표에서 같은 특징·타깃 열을 고른다. 훈련은 `X_tr, y_tr = train[features], train[target]`."
+        },
+        {
+          "id": "D4-05",
+          "type": "코드",
+          "prompt": "모델 학습과 예측 코드로 옳은 것은?",
+          "choices": [
+            "`model.fit(X_tr)` → `pred = model.predict(X_te, y_te)`",
+            "`model.fit(X_tr, y_tr)` → `pred = model.predict(X_te)`",
+            "`model.fit(X_tr, y_tr)` → `pred = model.predict(y_te)`",
+            "`model.train(X_tr, y_tr)` → `pred = model.predict(X_te)`"
+          ],
+          "answer": 2,
+          "explanation": "학습은 입력과 정답(`fit(X, y)`), 예측은 입력만(`predict(X)`) 받는다. 정답 `y_te`는 예측 뒤 평가 함수에서 `pred`와 비교할 때 쓴다."
+        },
+        {
+          "id": "D4-06",
+          "type": "개념",
+          "prompt": "아래 코드에서 `LinearRegression()`을 `RandomForestRegressor(n_estimators=300, random_state=42)`로 바꿀 때 함께 고쳐야 하는 것은?",
+          "box": "```python\nmodel = LinearRegression()\nmodel.fit(X_tr, y_tr)\npred = model.predict(X_te)\n```",
+          "choices": [
+            "`fit`에 `n_estimators`를 넘겨야 한다",
+            "`predict` 대신 `predict_proba`를 써야 한다",
+            "`fit` 앞에 `StandardScaler`를 반드시 넣어야 한다",
+            "없다 — 생성자 줄만 바꾸면 된다"
+          ],
+          "answer": 4,
+          "explanation": "sklearn 모델은 모두 같은 `fit`/`predict` 인터페이스를 가진다. 하이퍼파라미터는 생성자에서 정하므로, 모델이 바뀌어도 학습·예측 두 줄은 그대로다."
+        }
+      ]
+    },
+    {
+      "id": "D5",
+      "title": "⑥ 스케일링·파이프라인",
+      "questions": [
+        {
+          "id": "D5-01",
+          "type": "코드",
+          "prompt": "표준화 스케일러를 훈련·테스트 데이터에 적용하는 코드로 옳은 것은?",
+          "choices": [
+            "`X_tr_s = scaler.fit_transform(X_tr)` / `X_te_s = scaler.fit_transform(X_te)`",
+            "`X_tr_s = scaler.transform(X_tr)` / `X_te_s = scaler.fit_transform(X_te)`",
+            "`X_tr_s = scaler.fit_transform(X_tr)` / `X_te_s = scaler.transform(X_te)`",
+            "`X_tr_s = scaler.fit(X_tr)` / `X_te_s = scaler.fit(X_te)`"
+          ],
+          "answer": 3,
+          "explanation": "평균·표준편차는 **훈련 데이터로만** 구하고(`fit`), 그 값으로 훈련·테스트를 똑같이 변환한다(`transform`). 테스트에 다시 `fit`하면 테스트 정보가 전처리에 섞이고(데이터 누수), 훈련과 다른 기준으로 변환된다. `fit`은 스케일러 자신을 돌려줄 뿐 변환된 데이터를 주지 않는다."
+        },
+        {
+          "id": "D5-02",
+          "type": "비교",
+          "prompt": "`fit_transform`과 `transform`의 차이로 옳은 것은?",
+          "choices": [
+            "`fit_transform`은 기준을 새로 구해 변환, `transform`은 구해 둔 기준으로 변환만",
+            "`fit_transform`은 모델 학습까지 하고, `transform`은 전처리만 한다",
+            "`fit_transform`은 테스트 데이터용이고, `transform`은 훈련 데이터용이다",
+            "`fit_transform`은 행을 섞은 뒤 변환하고, `transform`은 순서를 유지해 변환한다"
+          ],
+          "answer": 1,
+          "explanation": "기준 = 평균·표준편차. `fit_transform(X)`는 `fit(X)` 다음 `transform(X)`이다. 기준은 훈련 데이터에서 한 번만 구한다."
+        },
+        {
+          "id": "D5-03",
+          "type": "개념",
+          "prompt": "`StandardScaler`가 각 열에 하는 변환은?",
+          "choices": [
+            "(x − 최솟값) / (최댓값 − 최솟값) — 0–1 범위",
+            "(x − 중앙값) / IQR — 중앙값 0",
+            "log(x) — 오른쪽 꼬리를 줄임",
+            "(x − 평균) / 표준편차 — 평균 0, 표준편차 1"
+          ],
+          "answer": 4,
+          "explanation": "표준화는 열마다 평균을 빼고 표준편차로 나눠, 단위가 다른 특징을 같은 눈금으로 맞춘다. 거리(kNN)나 계수 크기(로지스틱·규제)를 쓰는 모델에 필요하다."
+        },
+        {
+          "id": "D5-04",
+          "type": "코드",
+          "prompt": "스케일러와 로지스틱 회귀를 하나의 모델로 묶는 코드는?",
+          "choices": [
+            "`make_pipeline(StandardScaler(), LogisticRegression(max_iter=2000))`",
+            "`make_pipeline(LogisticRegression(max_iter=2000), StandardScaler())`",
+            "`make_pipeline(StandardScaler, LogisticRegression)`",
+            "`make_pipeline([StandardScaler(), LogisticRegression(max_iter=2000)])`"
+          ],
+          "answer": 1,
+          "explanation": "단계를 실행 순서대로, 괄호를 붙인 **객체**로 나열하고 모델은 마지막에 둔다. 리스트로 감싸지 않는다."
+        },
+        {
+          "id": "D5-05",
+          "type": "개념",
+          "prompt": "`model = make_pipeline(StandardScaler(), LogisticRegression(max_iter=2000))`에서 `model.fit(X_tr, y_tr)`와 `model.predict(X_te)`가 내부에서 하는 일로 옳은 것은?",
+          "choices": [
+            "fit: X_tr로 스케일러 `fit_transform` → 모델 학습 / predict: X_te로 `fit_transform` → 예측",
+            "fit: X_tr와 X_te를 합쳐 스케일러 `fit` → 모델 학습 / predict: 그대로 예측",
+            "fit: X_tr로 스케일러 `fit_transform` → 모델 학습 / predict: X_te를 `transform` → 예측",
+            "fit: 모델만 학습 / predict: X_te로 스케일러 `fit_transform` → 예측"
+          ],
+          "answer": 3,
+          "explanation": "파이프라인은 fit_transform/transform 규칙을 자동으로 지켜 준다. 그래서 교차검증에서도 폴드마다 훈련 폴드로만 스케일러가 fit된다."
+        }
+      ]
+    },
+    {
+      "id": "M1",
+      "title": "모델 생성자",
+      "questions": [
+        {
+          "id": "M1-01",
+          "type": "코드",
+          "prompt": "선형회귀 모델의 생성자는?",
+          "choices": [
+            "`LinearRegressor()`",
+            "`LinearRegression()`",
+            "`LogisticRegression()`",
+            "`LinearModel()`"
+          ],
+          "answer": 2,
+          "explanation": "sklearn은 선형회귀를 `LinearRegression`으로 쓴다(Regressor 아님). `LogisticRegression`은 이름과 달리 **분류** 모델이다."
+        },
+        {
+          "id": "M1-02",
+          "type": "코드",
+          "prompt": "실습에서 쓴 Ridge 회귀의 생성자는?",
+          "choices": [
+            "`Ridge(lambda=1.0)`",
+            "`Ridge(alpha=1.0)`",
+            "`Ridge(C=1.0)`",
+            "`Ridge(penalty=1.0)`"
+          ],
+          "answer": 2,
+          "explanation": "규제 강도는 `alpha`(이론의 λ)다. `lambda`는 파이썬 예약어라 인자 이름으로 쓸 수 없고, `C`는 로지스틱 회귀의 규제 인자다."
+        },
+        {
+          "id": "M1-03",
+          "type": "코드",
+          "prompt": "실습에서 쓴 Lasso 회귀의 생성자는?",
+          "choices": [
+            "`Lasso(alpha=1.0, n_iter=50000)`",
+            "`Lasso(alpha=1.0, n_estimators=50000)`",
+            "`Lasso(alpha=1.0, max_iter=50000)`",
+            "`Lasso(lambda=1.0, max_iter=50000)`"
+          ],
+          "answer": 3,
+          "explanation": "`max_iter`는 최적화 반복 상한(Lasso 기본 1000). 5차 다항 특징처럼 열이 많으면 기본값으로는 수렴하지 않아 크게 준다."
+        },
+        {
+          "id": "M1-04",
+          "type": "코드",
+          "prompt": "실습에서 쓴 로지스틱 회귀의 생성자는?",
+          "choices": [
+            "`LogisticRegression(max_iter=2000)`",
+            "`LogisticRegression(n_iter=2000)`",
+            "`LogisticRegression(alpha=2000)`",
+            "`LogisticRegression(n_estimators=2000)`"
+          ],
+          "answer": 1,
+          "explanation": "기본 반복 상한(100)으로 수렴하지 않을 때를 대비해 `max_iter`를 늘린다 — Lasso와 같은 이름의 인자다."
+        },
+        {
+          "id": "M1-05",
+          "type": "코드",
+          "prompt": "이웃 수 `k`인 kNN 분류기의 생성자는?",
+          "choices": [
+            "`KNeighborsClassifier(k=k)`",
+            "`KNNClassifier(n_neighbors=k)`",
+            "`KNeighborsClassifier(n_neighbor=k)`",
+            "`KNeighborsClassifier(n_neighbors=k)`"
+          ],
+          "answer": 4,
+          "explanation": "클래스는 `KNeighborsClassifier`(sklearn.neighbors), 이웃 수는 복수형 `n_neighbors`다."
+        },
+        {
+          "id": "M1-06",
+          "type": "코드",
+          "prompt": "깊이 상한이 `depth`인 결정트리 분류기의 생성자는?",
+          "choices": [
+            "`DecisionTreeClassifier(depth=depth, random_state=42)`",
+            "`DecisionTreeClassifier(max_depth=depth, random_state=42)`",
+            "`DecisionTreeClassifier(n_estimators=depth, random_state=42)`",
+            "`DecisionTreeClassifier(max_leaf=depth, random_state=42)`"
+          ],
+          "answer": 2,
+          "explanation": "트리 깊이 상한은 `max_depth`(None이면 끝까지 자람). `n_estimators`는 트리 **개수**라 앙상블에만 있다."
+        },
+        {
+          "id": "M1-07",
+          "type": "코드",
+          "prompt": "교통사고 중상 여부(0/1)를 랜덤포레스트로 예측할 때의 생성자는?",
+          "choices": [
+            "`RandomForestRegressor(n_estimators=300, random_state=42)`",
+            "`RandomForestClassifier(n_trees=300, random_state=42)`",
+            "`RandomForestClassifier(max_depth=300, random_state=42)`",
+            "`RandomForestClassifier(n_estimators=300, random_state=42)`"
+          ],
+          "answer": 4,
+          "explanation": "범주(0/1)를 맞히면 Classifier, 연속값이면 Regressor. 트리 개수는 `n_estimators`."
+        },
+        {
+          "id": "M1-08",
+          "type": "코드",
+          "prompt": "내일 PM2.5 농도(연속값)를 랜덤포레스트로 예측할 때의 생성자는?",
+          "choices": [
+            "`RandomForestClassifier(n_estimators=300, random_state=42)`",
+            "`RandomForestRegressor(n_estimator=300, random_state=42)`",
+            "`RandomForestRegressor(n_estimators=300, random_state=42)`",
+            "`RandomForestRegressor(num_trees=300, random_state=42)`"
+          ],
+          "answer": 3,
+          "explanation": "연속값 예측은 Regressor. 트리 개수 인자는 복수형 `n_estimators`."
+        },
+        {
+          "id": "M1-09",
+          "type": "코드",
+          "prompt": "회귀 문제의 기준선(baseline) 모델 생성자는?",
+          "choices": [
+            "`DummyRegressor(strategy=\"mean\")`",
+            "`DummyRegressor(strategy=\"most_frequent\")`",
+            "`DummyRegressor(method=\"mean\")`",
+            "`DummyClassifier(strategy=\"mean\")`"
+          ],
+          "answer": 1,
+          "explanation": "회귀 기준선은 훈련 타깃의 **평균**을 모든 행에 똑같이 예측한다. `most_frequent`는 분류용 전략이라 회귀에 넣으면 오류가 난다."
+        },
+        {
+          "id": "M1-10",
+          "type": "코드",
+          "prompt": "분류 문제의 기준선(baseline) 모델 생성자는?",
+          "choices": [
+            "`DummyClassifier(strategy=\"mean\")`",
+            "`DummyClassifier(strategy=\"mode\")`",
+            "`DummyRegressor(strategy=\"most_frequent\")`",
+            "`DummyClassifier(strategy=\"most_frequent\")`"
+          ],
+          "answer": 4,
+          "explanation": "분류 기준선은 훈련에서 **가장 많은 클래스**만 찍는다. 불균형 데이터에서는 이것만으로도 정확도가 높게 나와 정확도의 함정을 보여 준다."
+        },
+        {
+          "id": "M1-11",
+          "type": "코드",
+          "prompt": "실습에서 쓴 LightGBM 회귀 모델의 생성자는? (`import lightgbm as lgb`)",
+          "choices": [
+            "`lgb.LGBMRegressor(n_estimators=300, verbose=-1)`",
+            "`lgb.LGBMClassifier(n_estimators=300, verbose=-1)`",
+            "`lgb.LightGBMRegressor(n_estimators=300, verbose=-1)`",
+            "`lgb.LGBMRegressor(n_trees=300, verbose=-1)`"
+          ],
+          "answer": 1,
+          "explanation": "클래스 이름은 `LGBMRegressor`. `verbose=-1`은 학습 로그·경고 출력을 끈다."
+        },
+        {
+          "id": "M1-12",
+          "type": "짝",
+          "prompt": "**분류** 모델의 생성자로만 묶인 것은?",
+          "choices": [
+            "`LinearRegression`, `LogisticRegression`, `KNeighborsClassifier`",
+            "`LogisticRegression`, `KNeighborsClassifier`, `DummyClassifier`",
+            "`Ridge`, `Lasso`, `DecisionTreeClassifier`",
+            "`RandomForestRegressor`, `DecisionTreeClassifier`, `DummyClassifier`"
+          ],
+          "answer": 2,
+          "explanation": "`LogisticRegression`은 이름에 Regression이 있지만 클래스 확률을 내는 분류기다. `LinearRegression`, `Ridge`, `Lasso`, `…Regressor`는 회귀 모델이다."
+        }
+      ]
+    },
+    {
+      "id": "M2",
+      "title": "실습에 나온 파라미터",
+      "questions": [
+        {
+          "id": "M2-01",
+          "type": "개념",
+          "prompt": "`class_weight=\"balanced\"`를 넣은 모델과 그 효과로 옳은 것은?",
+          "choices": [
+            "`RandomForestClassifier` — 클래스마다 트리 개수를 같게 맞춘다",
+            "`LogisticRegression` — 많은 클래스의 행을 지워 클래스별 개수를 맞춘다",
+            "`LogisticRegression` — 적은 클래스를 틀릴 때 더 큰 벌점을 줘 소수 클래스 재현율을 높인다",
+            "`KNeighborsClassifier` — 가까운 이웃의 표에 더 큰 가중치를 준다"
+          ],
+          "answer": 3,
+          "explanation": "`balanced`는 클래스 빈도의 역수로 가중치를 준다(행을 지우거나 복제하지 않음). 전체 정확도는 조금 내려가도 드문 '나쁨·매우나쁨'을 덜 놓친다."
+        },
+        {
+          "id": "M2-02",
+          "type": "개념",
+          "prompt": "`RandomForestClassifier(..., min_samples_leaf=3)`에서 `min_samples_leaf=3`의 뜻은?",
+          "choices": [
+            "트리의 깊이를 최대 3단계로 제한한다",
+            "노드를 나눌 때 특징 3개만 후보로 본다",
+            "트리 3개의 예측을 묶어 평균을 낸다",
+            "잎 하나에 훈련 샘플이 최소 3개 있어야 한다"
+          ],
+          "answer": 4,
+          "explanation": "잎은 트리의 마지막 노드다. 잎이 너무 작게 쪼개지지 않게 막아, 개별 샘플을 외우는 과적합을 줄인다."
+        },
+        {
+          "id": "M2-03",
+          "type": "개념",
+          "prompt": "`n_jobs=-1`의 뜻은?",
+          "choices": [
+            "반복 횟수 제한을 없애고 수렴할 때까지 돈다",
+            "사용 가능한 CPU 코어를 모두 써서 병렬로 계산한다",
+            "학습 중 로그와 경고 출력을 모두 끈다",
+            "작업을 코어 하나에서 순서대로 실행한다"
+          ],
+          "answer": 2,
+          "explanation": "랜덤포레스트의 트리는 서로 독립이라 동시에 만들 수 있다. RandomizedSearchCV에도 써서 후보를 병렬로 평가했다. 로그 끄기는 `verbose=-1`."
+        },
+        {
+          "id": "M2-04",
+          "type": "개념",
+          "prompt": "특징 [a, b]에 `PolynomialFeatures(degree=2, include_bias=False)`를 적용한 결과 열은?",
+          "choices": [
+            "1, a, b, a², ab, b²",
+            "a², ab, b²",
+            "a, b, a², ab, b²",
+            "a, b, a², b²"
+          ],
+          "answer": 3,
+          "explanation": "`degree=2`는 2차까지의 제곱항과 **교차항**을 만든다. `include_bias=False`는 상수 1 열을 빼는데, 절편은 뒤의 `LinearRegression`이 따로 학습하기 때문이다."
+        },
+        {
+          "id": "M2-05",
+          "type": "개념",
+          "prompt": "부스팅 모델의 `learning_rate=0.03`에 대한 설명으로 옳은 것은?",
+          "choices": [
+            "트리 하나의 예측을 0.03배로 줄여서 더한다",
+            "전체 트리 중 3%만 골라서 학습한다",
+            "훈련 행의 3%를 검증용으로 떼어 둔다",
+            "잎 하나의 최소 샘플 비율을 3%로 정한다"
+          ],
+          "answer": 1,
+          "explanation": "부스팅은 앞 트리의 오차를 다음 트리가 고쳐 나가는데, 각 트리의 몫을 작게 해 천천히 맞춘다. 작을수록 트리가 많이 필요해서 트리 수를 크게 주고 조기 종료로 멈춘다."
+        },
+        {
+          "id": "M2-06",
+          "type": "비교",
+          "prompt": "`subsample=0.8`과 `colsample_bytree=0.8`의 차이로 옳은 것은?",
+          "choices": [
+            "`subsample`: 트리마다 열 80% / `colsample_bytree`: 트리마다 행 80%",
+            "`subsample`: 검증용 20% 분리 / `colsample_bytree`: 테스트용 20% 분리",
+            "`subsample`: 트리 80%만 사용 / `colsample_bytree`: 트리 깊이 80%로 제한",
+            "`subsample`: 트리마다 행 80% / `colsample_bytree`: 트리마다 열(특징) 80%"
+          ],
+          "answer": 4,
+          "explanation": "트리마다 데이터를 조금씩 다르게 보여 줘 과적합을 줄인다. col = column(열). LightGBM에서 `subsample`이 실제로 동작하려면 `subsample_freq=1`도 함께 준다."
+        },
+        {
+          "id": "M2-07",
+          "type": "코드",
+          "prompt": "LightGBM에서 트리 하나의 복잡도를 **잎 개수**로 제한하는 파라미터는?",
+          "choices": [
+            "`max_depth=31`",
+            "`min_samples_leaf=31`",
+            "`num_leaves=31`",
+            "`n_estimators=31`"
+          ],
+          "answer": 3,
+          "explanation": "LightGBM은 잎을 하나씩 늘려 가며 트리를 키우므로 잎 수 `num_leaves`로 복잡도를 정한다. XGBoost 실습은 `max_depth=5`로 깊이를 제한했다."
+        },
+        {
+          "id": "M2-08",
+          "type": "개념",
+          "prompt": "`early_stopping_rounds=100`이 들어가는 곳과 뜻으로 옳은 것은?",
+          "choices": [
+            "XGBoost 생성자 — 100라운드 동안 검증 개선이 없으면 멈춘다",
+            "XGBoost `fit` — 100번째 트리에서 무조건 학습을 멈춘다",
+            "LightGBM 생성자 — 트리를 100개씩 묶어서 검증한다",
+            "RandomForest 생성자 — 트리 100개마다 검증 점수를 본다"
+          ],
+          "answer": 1,
+          "explanation": "XGBoost는 생성자에 `early_stopping_rounds`를 두고 `fit`의 `eval_set`으로 검증 점수를 본다. LightGBM은 같은 일을 `fit`의 `callbacks=[lgb.early_stopping(100)]`으로 한다."
+        },
+        {
+          "id": "M2-09",
+          "type": "짝",
+          "prompt": "파라미터와 그것이 쓰인 곳의 짝으로 옳지 **않은** 것은?",
+          "choices": [
+            "`class_weight=\"balanced\"` — LogisticRegression",
+            "`num_leaves=31` — XGBoost",
+            "`min_samples_leaf=3` — RandomForestClassifier",
+            "`degree=2, include_bias=False` — PolynomialFeatures"
+          ],
+          "answer": 2,
+          "explanation": "`num_leaves`는 LightGBM의 파라미터다. XGBoost는 `max_depth`로 트리 크기를 제한했다."
+        }
+      ]
+    },
+    {
+      "id": "E",
+      "title": "평가 함수",
+      "questions": [
+        {
+          "id": "E-01",
+          "type": "코드",
+          "prompt": "MAE(평균 절대 오차)를 구하는 코드는?",
+          "choices": [
+            "`mean_absolute_error(pred)`",
+            "`mean_absolute_error(y_te, pred)`",
+            "`mean_abs_error(y_te, pred)`",
+            "`absolute_error(y_te, pred).mean()`"
+          ],
+          "answer": 2,
+          "explanation": "sklearn.metrics의 지표는 모두 `(정답, 예측)` 두 인자를 받는다."
+        },
+        {
+          "id": "E-02",
+          "type": "옳지 않은 것",
+          "prompt": "RMSE를 구하는 코드가 **아닌** 것은?",
+          "choices": [
+            "`root_mean_squared_error(y_te, pred)`",
+            "`np.sqrt(mean_squared_error(y_te, pred))`",
+            "`mean_squared_error(y_te, pred) ** 0.5`",
+            "`mean_squared_error(y_te, pred) ** 2`"
+          ],
+          "answer": 4,
+          "explanation": "RMSE = √MSE. 제곱근은 `np.sqrt` 또는 `** 0.5`이고, `** 2`는 제곱이다. 최신 sklearn은 `root_mean_squared_error`로 바로 구한다."
+        },
+        {
+          "id": "E-03",
+          "type": "코드",
+          "prompt": "결정계수 R²를 구하는 코드는?",
+          "choices": [
+            "`r2_score(y_te, pred)`",
+            "`r_squared(y_te, pred)`",
+            "`r2(y_te, pred)`",
+            "`score_r2(y_te, pred)`"
+          ],
+          "answer": 1,
+          "explanation": "회귀 지표는 `mean_absolute_error`, `mean_squared_error`, `root_mean_squared_error`, `r2_score` 네 개다."
+        },
+        {
+          "id": "E-04",
+          "type": "짝",
+          "prompt": "**분류** 평가 함수로만 묶인 것은?",
+          "choices": [
+            "`accuracy_score`, `r2_score`, `f1_score`",
+            "`mean_absolute_error`, `f1_score`, `confusion_matrix`",
+            "`accuracy_score`, `f1_score`, `confusion_matrix`",
+            "`r2_score`, `mean_squared_error`, `accuracy_score`"
+          ],
+          "answer": 3,
+          "explanation": "분류는 맞힘/틀림을 세고(정확도·F1·혼동행렬), 회귀는 오차의 크기를 잰다(MAE·MSE·RMSE·R²)."
+        },
+        {
+          "id": "E-05",
+          "type": "개념",
+          "prompt": "sklearn 평가 함수에 넘기는 인자의 순서로 옳은 것은?",
+          "choices": [
+            "(예측, 정답) — 예: `f1_score(pred, y_te)`",
+            "(정답, 예측) — 예: `f1_score(y_te, pred)`",
+            "(입력, 예측) — 예: `f1_score(X_te, pred)`",
+            "(모델, 입력) — 예: `f1_score(model, X_te)`"
+          ],
+          "answer": 2,
+          "explanation": "지표는 모두 `(y_true, y_pred)`. MAE처럼 대칭인 지표는 바꿔도 값이 같지만, 정밀도·재현율·F1·혼동행렬은 바꾸면 결과가 달라진다."
+        },
+        {
+          "id": "E-06",
+          "type": "개념",
+          "prompt": "`confusion_matrix(y_te, pred, labels=labels)`에서 `labels=labels`의 역할은?",
+          "choices": [
+            "예측할 클래스 이름을 모델에 알려 준다",
+            "labels에 없는 클래스를 가장 많은 클래스로 바꾼다",
+            "클래스마다 오분류 가중치를 정한다",
+            "행·열에 놓을 클래스의 순서를 정한다 (행 = 실제, 열 = 예측)"
+          ],
+          "answer": 4,
+          "explanation": "지정하지 않으면 정렬 순서(문자열이면 가나다순)로 놓여 '좋음–보통–나쁨–매우나쁨' 같은 자연스러운 순서가 깨진다."
+        },
+        {
+          "id": "E-07",
+          "type": "개념",
+          "prompt": "4개 등급(좋음·보통·나쁨·매우나쁨) 분류 결과에 `f1_score(y_te, pred)`를 그대로 쓰면?",
+          "choices": [
+            "등급별 F1을 단순 평균한 값이 나온다",
+            "가장 많은 등급 하나의 F1만 나온다",
+            "`average` 기본값이 이진용이라 오류가 난다",
+            "정확도와 같은 값이 그대로 나온다"
+          ],
+          "answer": 3,
+          "explanation": "기본값 `average=\"binary\"`는 0/1 이진 분류용이라 다중 클래스에서는 `average=\"macro\"` 등을 지정해야 한다. 5주차는 `f1_score(y_te, pred_lr, average='macro')`로 등급별 F1을 단순 평균했다."
+        },
+        {
+          "id": "E-08",
+          "type": "개념",
+          "prompt": "RMSE를 `np.sqrt(mean_squared_error(y_te, pred))`로 구하는 이유는?",
+          "choices": [
+            "제곱된 단위를 타깃과 같은 단위로 되돌리려고",
+            "MSE가 음수일 수 있어 크기만 남기려고",
+            "제곱근을 씌우면 큰 오차의 영향이 사라져서",
+            "sklearn에는 RMSE를 바로 구하는 함수가 없어서"
+          ],
+          "answer": 1,
+          "explanation": "MSE는 오차 제곱의 평균이라 단위도 제곱(MW²)이다. RMSE는 타깃과 같은 단위(MW, ㎍/m³)라 MAE와 나란히 비교할 수 있다. 제곱 뒤 평균이라 큰 오차의 영향은 여전히 크다. `root_mean_squared_error`도 있다."
+        }
+      ]
+    },
+    {
+      "id": "P1",
+      "title": "⑦ IQR 이상치 처리",
+      "questions": [
+        {
+          "id": "P1-01",
+          "type": "코드",
+          "prompt": "1사분위수와 3사분위수를 한 번에 구하는 코드는?",
+          "choices": [
+            "`q1, q3 = df[\"col\"].quantile([0.25, 0.75])`",
+            "`q1, q3 = df[\"col\"].quantile(0.25, 0.75)`",
+            "`q1, q3 = df[\"col\"].quantile([25, 75])`",
+            "`q1, q3 = df[\"col\"].percentile([0.25, 0.75])`"
+          ],
+          "answer": 1,
+          "explanation": "`quantile`은 0–1 사이 비율을 받고, 여러 개는 **리스트**로 넘긴다. 두 번째 위치 인자는 계산 방식(method)이라 `quantile(0.25, 0.75)`는 오류가 난다."
+        },
+        {
+          "id": "P1-02",
+          "type": "공식",
+          "prompt": "`iqr = q3 - q1`일 때 IQR 규칙의 상한 `upper`는?",
+          "choices": [
+            "`q3 + 1.5 * q1`",
+            "`q3 + 1.5 * iqr`",
+            "`q1 + 1.5 * iqr`",
+            "`q3 + 3 * iqr`"
+          ],
+          "answer": 2,
+          "explanation": "IQR = Q3 − Q1(가운데 50%의 폭). 상한 = Q3 + 1.5 × IQR, 하한 = Q1 − 1.5 × IQR."
+        },
+        {
+          "id": "P1-03",
+          "type": "코드",
+          "prompt": "상한을 넘는 이상치의 **개수**를 구하는 코드는?",
+          "choices": [
+            "`n_out = (df[\"col\"] > upper).count()`",
+            "`n_out = len(df[\"col\"] > upper)`",
+            "`n_out = (df[\"col\"] > upper).sum()`",
+            "`n_out = (df[\"col\"] > upper).mean()`"
+          ],
+          "answer": 3,
+          "explanation": "True = 1이라 합이 True의 개수다. `count()`와 `len()`은 True/False를 가리지 않고 전체 행 수를 세고, `mean()`은 비율이다."
+        },
+        {
+          "id": "P1-04",
+          "type": "코드",
+          "prompt": "상한 이하인 행과 **결측인 행**을 남기는 코드는?",
+          "choices": [
+            "`df[(df[\"col\"] <= upper) & df[\"col\"].isna()]`",
+            "`df[(df[\"col\"] <= upper) | df[\"col\"].notna()]`",
+            "`df[(df[\"col\"] > upper) | df[\"col\"].isna()]`",
+            "`df[(df[\"col\"] <= upper) | df[\"col\"].isna()]`"
+          ],
+          "answer": 4,
+          "explanation": "'또는'은 `|`. `&`면 상한 이하이면서 결측인 행(없음)만 남는다. 조건은 남길 행을 고르므로 `<= upper`."
+        },
+        {
+          "id": "P1-05",
+          "type": "개념",
+          "prompt": "이상치 필터에서 `| df[\"col\"].isna()`를 빼면 일어나는 일은?",
+          "choices": [
+            "결측 행도 이상치와 함께 지워진다",
+            "NaN이 상한값으로 바뀌어 남는다",
+            "비교할 수 없어 오류가 나고 멈춘다",
+            "결측 행만 남고 정상 행이 지워진다"
+          ],
+          "answer": 1,
+          "explanation": "`NaN <= upper`는 False. 결측은 다음 단계(보간·대체·행 제거)에서 의도대로 처리하려고 이 단계에서는 남겨 둔다."
+        },
+        {
+          "id": "P1-06",
+          "type": "비교",
+          "prompt": "이상치 처리의 두 방식에 대한 설명으로 옳은 것은?",
+          "choices": [
+            "필터 `df[df[\"col\"] <= upper]`는 값을 깎고, `clip(upper=upper)`는 행을 지운다",
+            "둘 다 행을 지우지만, `clip`은 인덱스를 다시 매겨 준다",
+            "둘 다 값을 깎지만, 필터는 결측도 함께 채운다",
+            "필터 `df[df[\"col\"] <= upper]`는 행을 지우고, `clip(upper=upper)`는 행을 남긴 채 값을 상한으로 깎는다"
+          ],
+          "answer": 4,
+          "explanation": "제거는 데이터 수가 줄고, clipping은 행 수를 유지하되 극단값의 크기만 줄인다."
+        }
+      ]
+    },
+    {
+      "id": "P2",
+      "title": "⑧ 원-핫 인코딩·컬럼 정렬",
+      "questions": [
+        {
+          "id": "P2-01",
+          "type": "코드",
+          "prompt": "타깃 열을 빼고 범주형 열 `cat_cols`만 원-핫 인코딩하는 코드는?",
+          "choices": [
+            "`pd.get_dummies(train, columns=[target])`",
+            "`pd.get_dummies(train.drop(columns=[target]), columns=cat_cols)`",
+            "`pd.get_dummies(train.drop(target), columns=cat_cols)`",
+            "`pd.get_dummies(train.drop(columns=cat_cols), columns=[target])`"
+          ],
+          "answer": 2,
+          "explanation": "`drop(columns=[...])`로 정답 열을 빼고, `columns=`로 인코딩할 범주 열을 지정한다. `drop(target)`처럼 `columns=` 없이 쓰면 **행** 이름에서 찾다가 KeyError가 난다."
+        },
+        {
+          "id": "P2-02",
+          "type": "코드",
+          "prompt": "테스트의 원-핫 결과를 훈련의 열 구성·순서에 맞추는 코드는?",
+          "choices": [
+            "`X_tr = X_tr.reindex(columns=X_te.columns, fill_value=0)`",
+            "`X_te = X_te.reindex(columns=X_tr.columns, fill_value=np.nan)`",
+            "`X_te = X_te.reindex(columns=X_tr.columns, fill_value=0)`",
+            "`X_te = X_te.reindex(index=X_tr.columns, fill_value=0)`"
+          ],
+          "answer": 3,
+          "explanation": "기준은 항상 **훈련** 열이다 — 모델은 훈련 때의 열 이름·순서로 입력을 받는다. 없는 범주 열은 '그 범주가 아님'이므로 0으로 채운다."
+        },
+        {
+          "id": "P2-03",
+          "type": "개념",
+          "prompt": "테스트에만 있는 범주로 생긴 원-핫 열은 `X_te.reindex(columns=X_tr.columns, fill_value=0)` 뒤 어떻게 되나?",
+          "choices": [
+            "0으로 채워져 남는다",
+            "훈련 쪽에도 같은 열이 추가된다",
+            "오류가 나서 멈춘다",
+            "열이 버려진다"
+          ],
+          "answer": 4,
+          "explanation": "`reindex`는 지정한 열 목록만 그 순서대로 남긴다. 반대로 훈련에만 있던 열은 새로 생기며 0으로 채워진다."
+        },
+        {
+          "id": "P2-04",
+          "type": "개념",
+          "prompt": "train과 test를 따로 `get_dummies`한 뒤 `reindex`가 필요한 이유는?",
+          "choices": [
+            "범주 구성이 달라 생기는 열이 다를 수 있어서",
+            "`get_dummies`가 행 순서를 무작위로 섞어서",
+            "테스트에서는 숫자 열까지 인코딩되어서",
+            "`get_dummies`가 결측을 훈련 평균으로 채워서"
+          ],
+          "answer": 1,
+          "explanation": "어떤 범주가 test에 없거나 test에만 있으면 열이 달라진다. 열이 하나라도 어긋나면 모델 입력이 틀어지거나 오류가 난다."
+        }
+      ]
+    },
+    {
+      "id": "P3",
+      "title": "⑨ 다항회귀 파이프라인",
+      "questions": [
+        {
+          "id": "P3-01",
+          "type": "순서",
+          "prompt": "실습의 2차 다항회귀 파이프라인 단계 순서로 옳은 것은?",
+          "choices": [
+            "StandardScaler → PolynomialFeatures → LinearRegression",
+            "PolynomialFeatures → LinearRegression → StandardScaler",
+            "PolynomialFeatures → StandardScaler → LinearRegression",
+            "LinearRegression → PolynomialFeatures → StandardScaler"
+          ],
+          "answer": 3,
+          "fixedOrder": true,
+          "explanation": "특징을 먼저 늘리고(제곱·교차항), 늘어난 열들의 크기를 맞춘 뒤, 모델을 마지막에 둔다. 파이프라인의 마지막 단계만 모델일 수 있다."
+        },
+        {
+          "id": "P3-02",
+          "type": "코드",
+          "prompt": "2차 다항회귀 파이프라인 코드로 옳은 것은?",
+          "choices": [
+            "`make_pipeline(PolynomialFeatures(degrees=2, bias=False), StandardScaler(), LinearRegression())`",
+            "`make_pipeline(PolynomialFeatures(degree=2, include_bias=False), StandardScaler(), LinearRegression())`",
+            "`make_pipeline(PolynomialFeatures(power=2, include_bias=False), StandardScaler(), LinearRegression())`",
+            "`make_pipeline(PolynomialFeatures(degree=2, include_intercept=False), StandardScaler(), LinearRegression())`"
+          ],
+          "answer": 2,
+          "explanation": "인자 이름은 `degree`(단수)와 `include_bias`. 5주차 규제 비교는 같은 틀에 `degree=5`와 Ridge·Lasso를 넣었다."
+        },
+        {
+          "id": "P3-03",
+          "type": "개념",
+          "prompt": "`PolynomialFeatures`에 `include_bias=False`를 주는 이유는?",
+          "choices": [
+            "편향(bias)이 큰 과소적합을 막기 위해서",
+            "1차 항을 빼고 제곱항만 남기기 위해서",
+            "절편은 선형회귀가 따로 학습하므로",
+            "결측이 있는 열을 미리 빼 두기 위해서"
+          ],
+          "answer": 3,
+          "explanation": "bias 열 = 모든 값이 1인 상수 열. `LinearRegression`의 `fit_intercept=True`(기본)가 같은 역할을 한다."
+        }
+      ]
+    },
+    {
+      "id": "P4",
+      "title": "⑩ 교차검증",
+      "questions": [
+        {
+          "id": "P4-01",
+          "type": "코드",
+          "prompt": "행을 섞어 5개 폴드로 나누는 K-Fold 객체는?",
+          "choices": [
+            "`KFold(n_folds=5, shuffle=True, random_state=42)`",
+            "`KFold(k=5, shuffle=True, random_state=42)`",
+            "`KFold(n_splits=5, shuffle=False, random_state=42)`",
+            "`KFold(n_splits=5, shuffle=True, random_state=42)`"
+          ],
+          "answer": 4,
+          "explanation": "폴드 수는 `n_splits`. `random_state`는 섞을 때만 의미가 있어, `shuffle=False`와 함께 주면 sklearn이 오류를 낸다."
+        },
+        {
+          "id": "P4-02",
+          "type": "코드",
+          "prompt": "시계열 데이터에 쓰는 분할 객체는?",
+          "choices": [
+            "`TimeSeriesSplit(n_splits=5)`",
+            "`TimeSeriesSplit(n_splits=5, shuffle=True)`",
+            "`KFold(n_splits=5, shuffle=True)`",
+            "`TimeSplit(n_splits=5)`"
+          ],
+          "answer": 1,
+          "explanation": "항상 과거 구간으로 학습하고 바로 뒤 미래 구간으로 검증한다. 순서를 지키는 것이 목적이라 `shuffle` 인자가 없다."
+        },
+        {
+          "id": "P4-03",
+          "type": "개념",
+          "prompt": "`-cross_val_score(..., scoring=\"neg_mean_absolute_error\")`처럼 앞에 `-`를 붙이는 이유는?",
+          "choices": [
+            "MAE 계산 중 생긴 음수 오차를 양수로 고치려고",
+            "폴드별 점수의 순서를 거꾸로 뒤집으려고",
+            "음수로 나온 MAE를 양수로 되돌리려고",
+            "가장 나쁜 폴드 대신 가장 좋은 폴드를 고르려고"
+          ],
+          "answer": 3,
+          "explanation": "sklearn은 점수를 '클수록 좋음'으로 통일해, 오차 지표는 `neg_`를 붙여 음수로 돌려준다. 점수 규칙을 '클수록 좋음' 하나로 통일하려고 오차 지표에는 `neg_`가 붙는다."
+        },
+        {
+          "id": "P4-04",
+          "type": "코드",
+          "prompt": "5-Fold 교차검증으로 폴드별 MAE를 구하는 코드는?",
+          "choices": [
+            "`scores = -cross_val_score(model, X, y, cv=kf, scoring=\"mean_absolute_error\")`",
+            "`scores = -cross_val_score(model, X, y, cv=kf, scoring=\"neg_mean_absolute_error\")`",
+            "`scores = -cross_val_score(X, y, model, cv=kf, scoring=\"neg_mean_absolute_error\")`",
+            "`scores = -cross_val_score(model, X_tr, X_te, cv=kf, scoring=\"neg_mean_absolute_error\")`"
+          ],
+          "answer": 2,
+          "explanation": "인자는 (모델, X, y) 순서이고, X·y는 나누기 **전** 전체 훈련 데이터다 — 나누는 일은 `cv=`가 한다. 점수 이름에 `neg_`가 없으면 오류가 난다."
+        },
+        {
+          "id": "P4-05",
+          "type": "개념",
+          "prompt": "`cross_val_score`가 돌려주는 것은?",
+          "choices": [
+            "가장 좋은 폴드에서 나온 점수 하나",
+            "모든 폴드 점수를 평균한 값 하나",
+            "폴드마다 학습된 모델 객체의 목록",
+            "폴드마다 하나씩, 폴드 수만큼의 점수 배열"
+          ],
+          "answer": 4,
+          "explanation": "그래서 `scores.mean()`(평균)과 `scores.std()`(흔들림)로 요약해 '평균 ± 표준편차'로 보고한다."
+        },
+        {
+          "id": "P4-06",
+          "type": "개념",
+          "prompt": "날짜순 데이터에 무작위 `KFold`를 쓰면 생기는 문제는?",
+          "choices": [
+            "폴드 수가 자동으로 2개로 줄어든다",
+            "미래 관측이 훈련에 섞여 점수가 낙관적이 된다",
+            "같은 행이 검증 폴드에 두 번씩 들어간다",
+            "시간 열 때문에 모델이 학습되지 않는다"
+          ],
+          "answer": 2,
+          "explanation": "실제 예측은 과거로 미래를 맞히는 일이다. `TimeSeriesSplit`은 항상 앞 구간으로 학습하고 뒤 구간으로 검증한다."
+        }
+      ]
+    },
+    {
+      "id": "P5",
+      "title": "⑪ 하이퍼파라미터 탐색",
+      "questions": [
+        {
+          "id": "P5-01",
+          "type": "코드",
+          "prompt": "`RandomizedSearchCV`에 후보 사전 `param_dist`를 넘기는 인자 이름은?",
+          "choices": [
+            "`param_grid=param_dist`",
+            "`param_distribution=param_dist`",
+            "`param_distributions=param_dist`",
+            "`param_dist=param_dist`"
+          ],
+          "answer": 3,
+          "explanation": "`param_grid`는 모든 조합을 다 보는 GridSearchCV의 인자다."
+        },
+        {
+          "id": "P5-02",
+          "type": "개념",
+          "prompt": "`RandomizedSearchCV(..., n_iter=25, ...)`에서 `n_iter=25`의 뜻은?",
+          "choices": [
+            "후보 조합 중 25개를 무작위로 골라 평가한다",
+            "모델 하나를 25번 반복해서 학습한다",
+            "데이터를 25개 폴드로 나눠 교차검증한다",
+            "부스팅 트리 25개로 각 후보를 학습한다"
+          ],
+          "answer": 1,
+          "explanation": "후보 조합이 수천 개라 다 보면 오래 걸린다. 무작위 25개만 교차검증으로 평가한다."
+        },
+        {
+          "id": "P5-03",
+          "type": "코드",
+          "prompt": "탐색이 끝난 뒤 최적 파라미터로 **다시 학습된 모델**을 꺼내는 코드는?",
+          "choices": [
+            "`best = search.best_estimator_`",
+            "`best = search.best_params_`",
+            "`best = search.best_score_`",
+            "`best = search.best_model()`"
+          ],
+          "answer": 1,
+          "explanation": "`best_params_`는 파라미터 사전, `best_score_`는 최고 CV 점수(여기서는 음수 MAE). `refit=True`(기본)라 `best_estimator_`는 전체 훈련 데이터에 재학습되어 바로 `predict`할 수 있다."
+        },
+        {
+          "id": "P5-04",
+          "type": "옳지 않은 것",
+          "prompt": "아래 탐색 코드에 대한 설명으로 옳지 **않은** 것은?",
+          "box": "```python\nsearch = RandomizedSearchCV(\n    model,\n    param_distributions=param_dist,\n    n_iter=25,\n    cv=tscv,\n    scoring=\"neg_mean_absolute_error\",\n    random_state=42,\n    n_jobs=-1)\nsearch.fit(X, y)\nbest = search.best_estimator_\n```",
+          "choices": [
+            "`cv=tscv`라 분할이 시간 순서를 지킨다",
+            "`neg_` 점수라 MAE가 작을수록 점수가 크다",
+            "최적 모델을 다시 `fit`해야 예측할 수 있다",
+            "`n_jobs=-1`로 여러 후보를 병렬로 평가한다"
+          ],
+          "answer": 3,
+          "explanation": "`refit=True`(기본)라 최적 모델은 이미 전체 `X`, `y`에 재학습되어 있다. `cv=tscv`는 시계열 분할, `neg_` 점수는 MAE가 작을수록 크다."
+        },
+        {
+          "id": "P5-05",
+          "type": "코드",
+          "prompt": "Optuna로 `learning_rate`를 0.01–0.1 사이에서 로그 척도로 고르는 코드는?",
+          "choices": [
+            "`trial.suggest_int(\"learning_rate\", 0.01, 0.1, log=True)`",
+            "`trial.suggest_float(\"learning_rate\", 0.01, 0.1, log=True)`",
+            "`trial.suggest_float(\"learning_rate\", 0.01, 0.1, step=True)`",
+            "`trial.suggest_float(0.01, 0.1, \"learning_rate\", log=True)`"
+          ],
+          "answer": 2,
+          "explanation": "실수는 `suggest_float`, 정수는 `suggest_int`. 인자는 (이름, 하한, 상한) 순서다."
+        },
+        {
+          "id": "P5-06",
+          "type": "코드",
+          "prompt": "Optuna로 `num_leaves`를 15–127 사이 정수에서 고르는 코드는?",
+          "choices": [
+            "`trial.suggest_float(\"num_leaves\", 15, 127)`",
+            "`trial.suggest_int(15, 127, \"num_leaves\")`",
+            "`trial.suggest_int(\"num_leaves\", [15, 127])`",
+            "`trial.suggest_int(\"num_leaves\", 15, 127)`"
+          ],
+          "answer": 4,
+          "explanation": "잎 개수는 정수라 `suggest_int(이름, 하한, 상한)`."
+        },
+        {
+          "id": "P5-07",
+          "type": "개념",
+          "prompt": "학습률을 `log=True`로 고르는 이유는?",
+          "choices": [
+            "뽑은 값을 로그로 바꿔 모델에 넘기려고",
+            "자릿수(배율) 단위로 고르게 탐색하려고",
+            "음수 학습률이 뽑히지 않게 하려고",
+            "학습률을 정수 단위로만 뽑으려고"
+          ],
+          "answer": 2,
+          "explanation": "0.01–0.1을 균등하게 뽑으면 대부분 0.03보다 큰 값이 나온다. 로그 척도는 0.01–0.03과 0.03–0.1처럼 배율이 비슷한 구간을 비슷한 확률로 고른다. 뽑힌 값 자체는 그대로 쓴다."
+        },
+        {
+          "id": "P5-08",
+          "type": "개념",
+          "prompt": "Optuna의 `objective(trial)`이 `scoring=\"neg_mean_absolute_error\"`로 교차검증할 때 돌려줘야 하는 값은? (`direction=\"minimize\"`)",
+          "choices": [
+            "`-cross_val_score(...).mean()` — 폴드 평균 MAE",
+            "`cross_val_score(...).mean()` — 폴드 평균 음수 MAE",
+            "`cross_val_score(...).max()` — 가장 좋은 폴드 점수",
+            "`mean_absolute_error(y_te, pred)` — 테스트 MAE"
+          ],
+          "answer": 1,
+          "explanation": "MAE를 최소화하려면 양수 MAE를 돌려준다. 음수 MAE를 최소화하면 오히려 MAE가 큰 쪽을 찾고, 테스트 점수로 튜닝하면 테스트 정보가 새어 든다."
+        }
+      ]
+    },
+    {
+      "id": "P6",
+      "title": "⑫ XGBoost·LightGBM 조기 종료",
+      "questions": [
+        {
+          "id": "P6-01",
+          "type": "코드",
+          "prompt": "훈련 데이터의 앞 80%로 학습하고 **뒤 20%**를 검증으로 쓰는 코드로 옳은 것은?",
+          "choices": [
+            "`cut = len(X_tr) * 0.8` / `X_fit, X_val = X_tr.iloc[:cut], X_tr.iloc[cut:]`",
+            "`cut = int(len(X_tr) * 0.8)` / `X_fit, X_val = X_tr.iloc[cut:], X_tr.iloc[:cut]`",
+            "`cut = int(len(X_tr) * 0.2)` / `X_fit, X_val = X_tr.iloc[:cut], X_tr.iloc[cut:]`",
+            "`cut = int(len(X_tr) * 0.8)` / `X_fit, X_val = X_tr.iloc[:cut], X_tr.iloc[cut:]`"
+          ],
+          "answer": 4,
+          "explanation": "위치 슬라이싱(`iloc`)은 정수만 받으므로 `int()`로 바꾼다. 시계열이라 섞지 않고 **뒤쪽**(미래) 20%를 검증으로 쓴다. y도 같은 `cut`으로 자른다."
+        },
+        {
+          "id": "P6-02",
+          "type": "개념",
+          "prompt": "조기 종료용 검증 세트를 테스트가 아니라 **훈련 데이터에서** 떼는 이유는?",
+          "choices": [
+            "테스트 데이터에는 타깃 열이 들어 있지 않아서",
+            "부스팅 모델은 테스트 데이터를 입력받지 못해서",
+            "테스트로 멈출 때를 고르면 테스트 정보가 새어서",
+            "훈련 데이터가 더 최근이라 검증에 알맞아서"
+          ],
+          "answer": 3,
+          "explanation": "조기 종료는 검증 점수를 보고 멈추므로, 검증에 테스트를 쓰면 테스트 정보로 모델을 고르는 누수가 된다. 검증 점수로 트리 수를 고르는 것도 튜닝이다. 테스트는 마지막 평가에만 써야 점수가 정직하다."
+        },
+        {
+          "id": "P6-03",
+          "type": "코드",
+          "prompt": "XGBoost를 조기 종료와 함께 학습하는 `fit` 코드는? (`early_stopping_rounds=100`은 생성자에 있다)",
+          "choices": [
+            "`xgb_model.fit(X_fit, y_fit, eval_set=[(X_te, y_te)], verbose=False)`",
+            "`xgb_model.fit(X_fit, y_fit, validation_data=(X_val, y_val), verbose=False)`",
+            "`xgb_model.fit(X_val, y_val, eval_set=[(X_fit, y_fit)], verbose=False)`",
+            "`xgb_model.fit(X_fit, y_fit, eval_set=[(X_val, y_val)], verbose=False)`"
+          ],
+          "answer": 4,
+          "explanation": "`eval_set`은 (입력, 정답) **튜플의 리스트**다. 학습은 X_fit, 감시는 X_val. 테스트를 감시에 쓰면 누수다."
+        },
+        {
+          "id": "P6-04",
+          "type": "코드",
+          "prompt": "LightGBM을 조기 종료와 함께 학습하는 `fit` 코드는?",
+          "choices": [
+            "`lgb_model.fit(X_fit, y_fit, eval_set=[(X_val, y_val)], early_stopping_rounds=100)`",
+            "`lgb_model.fit(X_fit, y_fit, eval_set=[(X_val, y_val)], callbacks=[lgb.early_stopping(100, verbose=False)])`",
+            "`lgb_model.fit(X_fit, y_fit, eval_set=[(X_val, y_val)], callbacks=lgb.early_stopping(100, verbose=False))`",
+            "`lgb_model.fit(X_fit, y_fit, eval_set=[(X_val, y_val)], callbacks=[lgb.early_stop(100)])`"
+          ],
+          "answer": 2,
+          "explanation": "LightGBM 4.x의 `fit`에는 `early_stopping_rounds` 인자가 없고, 콜백 **리스트**에 `lgb.early_stopping(라운드 수)`를 넣는다."
+        },
+        {
+          "id": "P6-05",
+          "type": "짝",
+          "prompt": "조기 종료 라운드 수(100)를 넣는 위치를 바르게 짝지은 것은?",
+          "choices": [
+            "XGBoost: `fit`의 `callbacks` / LightGBM: 생성자의 `early_stopping_rounds`",
+            "XGBoost와 LightGBM 모두 생성자의 `early_stopping_rounds`",
+            "XGBoost: 생성자의 `early_stopping_rounds` / LightGBM: `fit`의 `callbacks`",
+            "XGBoost와 LightGBM 모두 `fit`의 `callbacks`"
+          ],
+          "answer": 3,
+          "explanation": "검증 세트는 둘 다 `fit(..., eval_set=[(X_val, y_val)])`로 넘긴다. 멈출 기준을 두는 곳만 다르다."
+        }
+      ]
+    },
+    {
+      "id": "L",
+      "title": "저빈도 항목 (순환 특징·냉방도일·중요도·시각화)",
+      "questions": [
+        {
+          "id": "L-01",
+          "type": "코드",
+          "prompt": "시각 `x`(0–23)를 순환 특징 두 열로 바꾸는 코드는?",
+          "choices": [
+            "`np.sin(2 * np.pi * x / 24)`, `np.cos(2 * np.pi * x / 24)`",
+            "`np.sin(x / 24)`, `np.cos(x / 24)`",
+            "`np.sin(2 * np.pi * x / 12)`, `np.cos(2 * np.pi * x / 12)`",
+            "`np.sin(2 * np.pi * x)`, `np.cos(2 * np.pi * x)`"
+          ],
+          "answer": 1,
+          "explanation": "x / 24로 한 바퀴의 몇 분의 몇인지 구하고, 2π를 곱해 각도로 바꾼다. 12로 나누면 0시와 12시가 같은 점이 된다."
+        },
+        {
+          "id": "L-02",
+          "type": "개념",
+          "prompt": "시각을 sin과 cos **두 열**로 나타내는 이유로 옳은 것은?",
+          "choices": [
+            "시각을 0–1 범위로 표준화해 크기를 맞추려고",
+            "출퇴근 시각에 더 큰 값을 주어 강조하려고",
+            "23시와 0시를 이웃으로 놓고, 3시와 9시를 구별하려고",
+            "결측 시각을 앞뒤 값으로 보간하려고"
+          ],
+          "answer": 3,
+          "explanation": "원 위의 점(cos, sin)으로 놓으면 23시와 0시가 이웃이 된다. sin 하나로는 원의 위아래만 알 수 있어 3시와 9시가 같은 값(≈ 0.71)이 된다."
+        },
+        {
+          "id": "L-03",
+          "type": "숫자",
+          "prompt": "요일(0–6)을 같은 방식의 순환 특징으로 바꿀 때 `2 * np.pi * x / ___`의 빈칸에 들어갈 수는?",
+          "choices": [
+            "6",
+            "7",
+            "12",
+            "24"
+          ],
+          "answer": 2,
+          "fixedOrder": true,
+          "explanation": "한 주기의 길이로 나눈다 — 시각 24, 요일 7, 월 12. 6으로 나누면 월요일(0)과 일요일(6)이 같은 점이 된다."
+        },
+        {
+          "id": "L-04",
+          "type": "계산",
+          "prompt": "냉방도일 특징 `np.clip(x - 24, 0, None)`에서 평균기온 x가 30일 때와 20일 때의 값은?",
+          "choices": [
+            "6, −4",
+            "6, 0",
+            "0, 4",
+            "30, 20"
+          ],
+          "answer": 2,
+          "fixedOrder": true,
+          "explanation": "24도를 넘는 만큼만 남기고 그 아래는 0으로 깎는다(`None` = 상한 없음). 난방도일은 반대로 `np.clip(10 - x, 0, None)`."
+        },
+        {
+          "id": "L-05",
+          "type": "개념",
+          "prompt": "전력수요 선형회귀에 `np.clip(x - 24, 0, None)` 같은 특징을 더한 이유는?",
+          "choices": [
+            "기온과 수요가 U자 관계라 직선 하나로 못 맞춰서",
+            "기온 열의 결측을 앞뒤 값으로 채우려고",
+            "기온을 평균 0, 표준편차 1로 맞추려고",
+            "기온 열의 이상치를 찾아 지우려고"
+          ],
+          "answer": 1,
+          "explanation": "추울 때도 더울 때도 수요가 커진다. 24도를 넘는 구간에서만 커지는 특징을 주면, 선형회귀가 '더워질수록 수요 증가'를 따로 기울기로 학습할 수 있다."
+        },
+        {
+          "id": "L-06",
+          "type": "코드",
+          "prompt": "학습된 트리 모델의 특징 중요도를 꺼내는 코드는?",
+          "choices": [
+            "`model.feature_importances()`",
+            "`model.coef_`",
+            "`model.importances_`",
+            "`model.feature_importances_`"
+          ],
+          "answer": 4,
+          "explanation": "끝에 밑줄이 붙은 속성은 `fit` 뒤에 생기는 학습 결과다(괄호 없음). `coef_`는 선형 모델의 계수다."
+        },
+        {
+          "id": "L-07",
+          "type": "개념",
+          "prompt": "`X_tr2 = X_tr.copy()`로 복사본을 만든 뒤 새 열을 넣는 이유는?",
+          "choices": [
+            "복사본에서는 학습 속도가 빨라지기 때문",
+            "원본 `X_tr`에 열이 추가되어 다른 모델의 입력이 바뀌는 것을 막으려고",
+            "`copy`가 결측을 자동으로 채우기 때문",
+            "DataFrame은 복사하지 않으면 열을 추가할 수 없기 때문"
+          ],
+          "answer": 2,
+          "explanation": "`X_tr2 = X_tr`처럼 대입만 하면 같은 객체를 가리켜, 새 열이 원본에도 생긴다."
+        },
+        {
+          "id": "L-08",
+          "type": "개념",
+          "prompt": "잔차 그림 코드 `plt.scatter(pred, resid, s=8, alpha=0.5)`에서 `s`와 `alpha`의 뜻은?",
+          "choices": [
+            "`s`: 표본 수 / `alpha`: 규제 강도",
+            "`s`: 점 모양 / `alpha`: 점 색",
+            "`s`: 점 크기 / `alpha`: 투명도",
+            "`s`: 표준편차 / `alpha`: 유의수준"
+          ],
+          "answer": 3,
+          "explanation": "점이 많을 때 작게(s) 반투명하게(alpha) 그려야 겹친 곳의 밀도가 보인다. 같은 `alpha`라도 Ridge·Lasso의 규제 강도와는 다른 인자다."
+        },
+        {
+          "id": "L-09",
+          "type": "코드",
+          "prompt": "잔차 그림에 y = 0 빨간 수평선을 긋는 코드는?",
+          "choices": [
+            "`plt.axhline(0, color=\"red\", lw=1)`",
+            "`plt.axvline(0, color=\"red\", lw=1)`",
+            "`plt.hline(0, color=\"red\", lw=1)`",
+            "`plt.plot(0, color=\"red\", lw=1)`"
+          ],
+          "answer": 1,
+          "explanation": "`axhline`은 수평선(h), `axvline`은 수직선(v). 잔차가 0선 위아래로 패턴 없이 흩어져야 좋은 모델이다."
+        }
+      ]
+    },
+    {
+      "id": "X",
+      "title": "헷갈리는 인자 대조",
+      "questions": [
+        {
+          "id": "X-01",
+          "type": "비교",
+          "prompt": "빈칸 (가) `df.dropna(___=[\"col\"])`, (나) `pd.get_dummies(df, ___=cat_cols)`에 들어갈 인자 이름을 차례로 짝지은 것은?",
+          "choices": [
+            "(가) `columns` (나) `subset`",
+            "(가) `subset` (나) `columns`",
+            "(가) `subset` (나) `subset`",
+            "(가) `columns` (나) `columns`"
+          ],
+          "answer": 2,
+          "explanation": "`dropna`는 어느 열의 결측을 볼지 `subset`으로 정한다. 열을 지정하는 나머지 자리(`drop`, `get_dummies`, `reindex`)는 `columns`다."
+        },
+        {
+          "id": "X-02",
+          "type": "비교",
+          "prompt": "`max_depth`와 `n_estimators`의 뜻을 바르게 짝지은 것은?",
+          "choices": [
+            "`max_depth`: 트리 개수 / `n_estimators`: 트리 하나의 깊이 상한",
+            "`max_depth`: 잎 개수 상한 / `n_estimators`: 교차검증 폴드 수",
+            "`max_depth`: 탐색할 후보 수 / `n_estimators`: 특징 개수",
+            "`max_depth`: 트리 하나의 깊이 상한 / `n_estimators`: 트리 개수"
+          ],
+          "answer": 4,
+          "explanation": "깊이는 트리 **하나**의 복잡도(키우면 과적합 위험), 개수는 앙상블의 크기(랜덤포레스트는 늘려도 과적합이 잘 늘지 않음)."
+        },
+        {
+          "id": "X-03",
+          "type": "비교",
+          "prompt": "`max_iter`와 `n_iter`의 쓰임을 바르게 짝지은 것은?",
+          "choices": [
+            "`max_iter`: RandomizedSearchCV의 후보 조합 수 / `n_iter`: LogisticRegression의 반복 상한",
+            "`max_iter`: 부스팅의 트리 개수 / `n_iter`: K-Fold의 폴드 수",
+            "`max_iter`: kNN의 이웃 수 / `n_iter`: Lasso의 규제 강도",
+            "`max_iter`: LogisticRegression·Lasso의 최적화 반복 상한 / `n_iter`: RandomizedSearchCV의 후보 조합 수"
+          ],
+          "answer": 4,
+          "explanation": "모델 생성자에는 `max_iter=2000`, `max_iter=50000`, 탐색기에는 `n_iter=25`."
+        },
+        {
+          "id": "X-04",
+          "type": "비교",
+          "prompt": "`verbose=-1`과 `n_jobs=-1`의 뜻을 바르게 짝지은 것은?",
+          "choices": [
+            "`verbose=-1`: 모든 CPU 코어 사용 / `n_jobs=-1`: 로그 끄기",
+            "`verbose=-1`: 로그 끄기 / `n_jobs=-1`: 모든 코어로 병렬 계산",
+            "`verbose=-1`: 반복 제한 없음 / `n_jobs=-1`: 작업 하나씩 실행",
+            "`verbose=-1`: 조기 종료 끄기 / `n_jobs=-1`: 마지막 작업 취소"
+          ],
+          "answer": 2,
+          "explanation": "둘 다 −1이지만 뜻이 다르다. LightGBM은 `verbose=-1`이 가장 조용한 단계다."
+        },
+        {
+          "id": "X-05",
+          "type": "비교",
+          "prompt": "`best_params_`와 `best_estimator_`의 차이로 옳은 것은?",
+          "choices": [
+            "`best_params_`는 재학습된 모델이고, `best_estimator_`는 파라미터 사전이다",
+            "`best_params_`는 최고 점수이고, `best_estimator_`는 최저 점수다",
+            "`best_params_`는 파라미터 사전이고, `best_estimator_`는 그 파라미터로 재학습된 모델이다",
+            "둘은 같은 객체를 가리키는 다른 이름이다"
+          ],
+          "answer": 3,
+          "explanation": "예측에는 `best_estimator_.predict(X_te)`. 최고 CV 점수는 `best_score_`."
+        }
+      ]
+    }
+  ]
+}

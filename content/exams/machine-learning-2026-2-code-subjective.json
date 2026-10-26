@@ -1,0 +1,1433 @@
+{
+  "$schema": "./exam.schema.json",
+  "id": "machine-learning-2026-2-code-subjective",
+  "title": "머신러닝응용 실습코드 암기 · 주관식",
+  "course": "머신러닝응용 · 2026-2학기",
+  "description": "객관식과 같은 범위를 보기 없이 직접 떠올린다. 손코딩 빈칸처럼 함수·인자 이름을 채우고, 자주 나오는 한 줄은 통째로 쓴다. 띄어쓰기·따옴표·괄호·밑줄 차이는 채점에서 무시한다.",
+  "tags": [
+    "머신러닝",
+    "실습코드",
+    "sklearn",
+    "pandas",
+    "암기",
+    "빈칸"
+  ],
+  "updated": "2026-10-27",
+  "sections": [
+    {
+      "id": "D1",
+      "title": "① 데이터 읽기·확인·통계",
+      "questions": [
+        {
+          "id": "D1-01",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "데이터를 읽고 확인하는 코드다. 빈칸 **(1)**–**(4)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\ndf = pd.__(1)__(\"data.csv\")\ndf.__(2)__().round(2)                  # 수치형 기초 통계\ndf.isna().__(3)__()                    # 열별 결측 개수\n(df.isna().__(4)__() * 100).round(2)   # 열별 결측 비율(%)\n```",
+          "blanks": [
+            [
+              "read_csv"
+            ],
+            [
+              "describe"
+            ],
+            [
+              "sum"
+            ],
+            [
+              "mean"
+            ]
+          ],
+          "explanation": "결측표 `isna()`에서 True = 1이라 합은 개수, 평균은 비율이다. `describe()`는 수치형 열의 기초 통계 표다."
+        },
+        {
+          "id": "D1-02",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "그룹별 평균을 구해 큰 값부터 정렬하는 코드다. 빈칸 **(1)**–**(3)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\ndf.__(1)__(\"col\")[\"value\"].mean()\ndf.groupby(\"col\")[\"value\"].mean().__(2)__(__(3)__=False)   # 큰 값부터\n```",
+          "blanks": [
+            [
+              "groupby"
+            ],
+            [
+              "sort_values"
+            ],
+            [
+              "ascending"
+            ]
+          ],
+          "explanation": "`groupby(기준)[열].mean()`으로 그룹별 평균, `sort_values(ascending=False)`로 내림차순 정렬한다."
+        },
+        {
+          "id": "D1-03",
+          "kind": "short",
+          "type": "코드 쓰기",
+          "prompt": "DataFrame `df`의 열별 결측 비율(%)을 소수 둘째 자리까지 구하는 코드를 한 줄로 쓰시오.",
+          "blanks": [
+            [
+              "(df.isna().mean() * 100).round(2)",
+              "(df.isnull().mean() * 100).round(2)",
+              "round(df.isna().mean() * 100, 2)"
+            ]
+          ],
+          "explanation": "결측표의 평균 = 결측 비율(0–1). 100을 곱한 뒤 반올림하므로 곱셈을 괄호로 먼저 묶는다."
+        },
+        {
+          "id": "D1-04",
+          "kind": "short",
+          "type": "코드 쓰기",
+          "prompt": "`col` 값이 같은 행끼리 묶어 `value`의 평균을 구하고, 큰 값부터 정렬하는 코드를 한 줄로 쓰시오.",
+          "blanks": [
+            [
+              "df.groupby(\"col\")[\"value\"].mean().sort_values(ascending=False)"
+            ]
+          ],
+          "explanation": "묶기(`groupby`) → 열 고르기(`[\"value\"]`) → 집계(`mean`) → 정렬(`sort_values`) 순서다."
+        },
+        {
+          "id": "D1-05",
+          "kind": "short",
+          "type": "단답",
+          "prompt": "`df.isna().sum()`은 열별 결측 **(1)**를, `df.isna().mean()`은 열별 결측 **(2)**을 돌려준다. 빈칸에 알맞은 말을 쓰시오.",
+          "blanks": [
+            [
+              "개수",
+              "수",
+              "갯수"
+            ],
+            [
+              "비율",
+              "비중"
+            ]
+          ],
+          "explanation": "True = 1, False = 0이므로 합은 True의 개수, 평균은 True의 비율이다."
+        }
+      ]
+    },
+    {
+      "id": "D2",
+      "title": "② 데이터 정제",
+      "questions": [
+        {
+          "id": "D2-01",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "중복 제거와 오류 코드 처리 코드다. 빈칸 **(1)**–**(4)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\ndf = df.__(1)__().reset_index(__(2)__=True)          # 중복 제거\ndf.__(3)__[df[\"col\"] < 0, \"col\"] = np.__(4)__        # 오류 코드(음수) → 결측\n```",
+          "blanks": [
+            [
+              "drop_duplicates"
+            ],
+            [
+              "drop"
+            ],
+            [
+              "loc"
+            ],
+            [
+              "nan"
+            ]
+          ],
+          "explanation": "`reset_index(drop=True)`는 기존 인덱스를 버리고 새로 매긴다. `loc[행 조건, 열]`로 조건에 맞는 칸만 골라 결측으로 바꾼다."
+        },
+        {
+          "id": "D2-02",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "결측 처리 코드다. 빈칸 **(1)**–**(6)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\ndf = df.__(1)__(\"date\").reset_index(drop=True)               # 시간순 정렬\ndf[\"temp\"] = df[\"temp\"].__(2)__()                            # 선형 보간\ndf[\"humid\"] = df[\"humid\"].__(3)__(df[\"humid\"].__(4)__())     # 중앙값 대체\ndf = df.__(5)__(__(6)__=[\"target\"])                          # 타깃 결측 행 제거\n```",
+          "blanks": [
+            [
+              "sort_values"
+            ],
+            [
+              "interpolate"
+            ],
+            [
+              "fillna"
+            ],
+            [
+              "median"
+            ],
+            [
+              "dropna"
+            ],
+            [
+              "subset"
+            ]
+          ],
+          "explanation": "보간은 시간 순서가 맞아야 의미가 있어 먼저 정렬한다. 채울 값은 `median()`으로 계산해 `fillna`에 넘기고, 타깃 결측 행은 `subset`으로 지정해 지운다."
+        },
+        {
+          "id": "D2-03",
+          "kind": "short",
+          "type": "코드 쓰기",
+          "prompt": "`col`이 음수인 칸만 결측(NaN)으로 바꾸는 코드를 한 줄로 쓰시오.",
+          "blanks": [
+            [
+              "df.loc[df[\"col\"] < 0, \"col\"] = np.nan"
+            ]
+          ],
+          "explanation": "`loc[행 조건, 열 이름] = np.nan`. 열 이름을 빼면 그 행의 모든 열이 NaN이 된다."
+        },
+        {
+          "id": "D2-04",
+          "kind": "short",
+          "type": "코드 쓰기",
+          "prompt": "상한 `upper`를 넘는 값을 행은 남긴 채 `upper`로 깎는 코드다. `df[\"col\"] = df[\"col\"]._____`의 빈칸을 쓰시오.",
+          "blanks": [
+            [
+              "clip(upper=upper)",
+              "clip(None, upper)",
+              "clip(lower=None, upper=upper)"
+            ]
+          ],
+          "explanation": "`clip(upper=…)`은 상한을 넘는 값을 상한으로 바꾼다. 필터(`df[df[\"col\"] <= upper]`)는 행을 지운다."
+        },
+        {
+          "id": "D2-05",
+          "kind": "short",
+          "type": "단답",
+          "prompt": "`df.dropna(subset=[\"col\"])`이 지우는 것은 **(1)**, `df.drop(columns=[\"col\"])`이 지우는 것은 **(2)**다. 각각 \"행\" 또는 \"열\"로 쓰시오.",
+          "blanks": [
+            [
+              "행",
+              "row"
+            ],
+            [
+              "열",
+              "column"
+            ]
+          ],
+          "explanation": "`dropna(subset=…)`은 그 열이 결측인 행을, `drop(columns=…)`는 열 자체를 지운다."
+        },
+        {
+          "id": "D2-06",
+          "kind": "short",
+          "type": "단답",
+          "prompt": "다음 처리에 쓰는 pandas 메서드 이름을 쓰시오. **(1)** 앞뒤 값 사이를 직선으로 채우기 **(2)** 주어진 값으로 결측 채우기 **(3)** 상한을 넘는 값을 상한으로 깎기",
+          "blanks": [
+            [
+              "interpolate"
+            ],
+            [
+              "fillna"
+            ],
+            [
+              "clip"
+            ]
+          ],
+          "explanation": "보간 `interpolate()`, 대체 `fillna(값)`, 깎기 `clip(upper=…)`."
+        }
+      ]
+    },
+    {
+      "id": "D3",
+      "title": "③ 날짜·특징 생성",
+      "questions": [
+        {
+          "id": "D3-01",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "날짜에서 특징을 꺼내는 코드다. 빈칸 **(1)**–**(4)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\ndf[\"date\"] = pd.__(1)__(df[\"date\"])\ndf[\"월\"] = df[\"date\"].__(2)__.month\ndf[\"시간\"] = df[\"date\"].dt.__(3)__\ndf[\"요일\"] = df[\"date\"].dt.__(4)__          # 월=0 … 일=6\n```",
+          "blanks": [
+            [
+              "to_datetime"
+            ],
+            [
+              "dt"
+            ],
+            [
+              "hour"
+            ],
+            [
+              "dayofweek",
+              "weekday"
+            ]
+          ],
+          "explanation": "날짜 타입으로 바꾼 뒤 `.dt` 접근자로 `month`, `hour`, `dayofweek`(월 = 0 … 일 = 6)를 꺼낸다."
+        },
+        {
+          "id": "D3-02",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "0/1 플래그 특징을 만드는 코드다. 빈칸 **(1)**–**(3)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\ndf[\"flag\"] = (df[\"col\"] > 0).__(1)__(int)\ndf[\"flag\"] = df[\"col\"].__(2)__([1, 2, 3]).astype(__(3)__)\n```",
+          "blanks": [
+            [
+              "astype"
+            ],
+            [
+              "isin"
+            ],
+            [
+              "int"
+            ]
+          ],
+          "explanation": "비교·포함 결과는 True/False라 `astype(int)`로 1/0을 만든다. 여러 값 중 하나인지는 `isin([...])`."
+        },
+        {
+          "id": "D3-03",
+          "kind": "short",
+          "type": "숫자",
+          "prompt": "`dt.dayofweek`는 월요일에 **(1)**, 토요일에 **(2)**, 일요일에 **(3)**을 돌려준다.",
+          "blanks": [
+            [
+              "0"
+            ],
+            [
+              "5"
+            ],
+            [
+              "6"
+            ]
+          ],
+          "explanation": "월요일부터 0으로 센다. 그래서 주말은 `요일 >= 5`."
+        },
+        {
+          "id": "D3-04",
+          "kind": "short",
+          "type": "코드 쓰기",
+          "prompt": "요일 열 `요일`(월 = 0 … 일 = 6)로 주말이면 1, 평일이면 0인 열 `주말여부`를 만드는 코드를 한 줄로 쓰시오.",
+          "blanks": [
+            [
+              "df[\"주말여부\"] = (df[\"요일\"] >= 5).astype(int)",
+              "df[\"주말여부\"] = (df[\"요일\"] > 4).astype(int)",
+              "df[\"주말여부\"] = df[\"요일\"].isin([5, 6]).astype(int)"
+            ]
+          ],
+          "explanation": "비교 결과를 괄호로 묶고 `astype(int)`. `isin([5, 6])`으로 써도 같다."
+        }
+      ]
+    },
+    {
+      "id": "D4",
+      "title": "④⑤ 분할·학습·예측",
+      "questions": [
+        {
+          "id": "D4-01",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "입력·정답을 나누고 훈련·테스트로 분할하는 코드다. 빈칸 **(1)**–**(5)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\nX = df[__(1)__]\ny = df[__(2)__]\nX_tr, X_te, y_tr, y_te = __(3)__(\n    X, y, __(4)__=0.2, __(5)__=42)\n```",
+          "blanks": [
+            [
+              "features"
+            ],
+            [
+              "target"
+            ],
+            [
+              "train_test_split"
+            ],
+            [
+              "test_size"
+            ],
+            [
+              "random_state"
+            ]
+          ],
+          "explanation": "입력은 특징 리스트로 고른 DataFrame, 정답은 타깃 열 Series. 20%를 테스트로, 시드 42로 분할을 고정한다."
+        },
+        {
+          "id": "D4-02",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "모델 학습·예측 코드다. 빈칸 **(1)**–**(4)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\nmodel = LinearRegression()\nmodel.__(1)__(X_tr, __(2)__)\npred = model.__(3)__(__(4)__)\n```",
+          "blanks": [
+            [
+              "fit"
+            ],
+            [
+              "y_tr"
+            ],
+            [
+              "predict"
+            ],
+            [
+              "X_te"
+            ]
+          ],
+          "explanation": "`fit(입력, 정답)`으로 학습, `predict(입력)`으로 예측."
+        },
+        {
+          "id": "D4-03",
+          "kind": "short",
+          "type": "코드 쓰기",
+          "prompt": "`train_test_split(X, y, ...)`의 반환값 네 개를 받는 변수 이름을 순서대로 **(1)**–**(4)**에 쓰시오. (변수 이름은 `X_tr`, `X_te`, `y_tr`, `y_te`)",
+          "blanks": [
+            [
+              "X_tr"
+            ],
+            [
+              "X_te"
+            ],
+            [
+              "y_tr"
+            ],
+            [
+              "y_te"
+            ]
+          ],
+          "explanation": "넘긴 배열마다 (훈련, 테스트) 쌍이 차례로 나온다."
+        },
+        {
+          "id": "D4-04",
+          "kind": "short",
+          "type": "코드 쓰기",
+          "prompt": "이미 나뉜 표 `train`에서 훈련 입력 `X_tr`과 정답 `y_tr`을 한 줄로 만드는 코드를 쓰시오. (특징 리스트 `features`, 타깃 이름 `target`)",
+          "blanks": [
+            [
+              "X_tr, y_tr = train[features], train[target]"
+            ]
+          ],
+          "explanation": "테스트도 같은 모양: `X_te, y_te = test[features], test[target]`."
+        }
+      ]
+    },
+    {
+      "id": "D5",
+      "title": "⑥ 스케일링·파이프라인",
+      "questions": [
+        {
+          "id": "D5-01",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "스케일링 코드다. 빈칸 **(1)**–**(3)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\nscaler = __(1)__()\nX_tr_s = scaler.__(2)__(X_tr)\nX_te_s = scaler.__(3)__(X_te)\n```",
+          "blanks": [
+            [
+              "StandardScaler"
+            ],
+            [
+              "fit_transform"
+            ],
+            [
+              "transform"
+            ]
+          ],
+          "explanation": "기준은 훈련 데이터로만 구하고(`fit_transform`), 테스트는 그 기준으로 변환만(`transform`) 한다."
+        },
+        {
+          "id": "D5-02",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "파이프라인 코드다. 빈칸 **(1)**–**(3)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\nmodel = __(1)__(\n    __(2)__(),\n    LogisticRegression(__(3)__=2000))\nmodel.fit(X_tr, y_tr)\npred = model.predict(X_te)\n```",
+          "blanks": [
+            [
+              "make_pipeline"
+            ],
+            [
+              "StandardScaler"
+            ],
+            [
+              "max_iter"
+            ]
+          ],
+          "explanation": "파이프라인 하나가 스케일링과 모델을 함께 `fit`·`predict`한다."
+        },
+        {
+          "id": "D5-03",
+          "kind": "short",
+          "type": "코드 쓰기",
+          "prompt": "스케일러 `scaler`로 **(1)** 훈련 데이터의 기준을 구해 변환한 `X_tr_s`와 **(2)** 같은 기준으로 테스트를 변환한 `X_te_s`를 만드는 코드를 각각 한 줄로 쓰시오.",
+          "blanks": [
+            [
+              "X_tr_s = scaler.fit_transform(X_tr)"
+            ],
+            [
+              "X_te_s = scaler.transform(X_te)"
+            ]
+          ],
+          "explanation": "테스트에 `fit_transform`을 쓰면 테스트 정보가 전처리에 섞인다."
+        },
+        {
+          "id": "D5-04",
+          "kind": "short",
+          "type": "용어",
+          "prompt": "테스트(또는 검증) 데이터의 정보가 학습·전처리 과정에 섞여 들어가 성능이 실제보다 좋게 나오는 문제를 무엇이라 하는가?",
+          "blanks": [
+            [
+              "데이터 누수",
+              "누수",
+              "data leakage",
+              "leakage",
+              "정보 누수"
+            ]
+          ],
+          "explanation": "테스트에 스케일러를 다시 fit하거나, 타깃 정보를 특징으로 쓰는 것이 대표적인 누수다."
+        }
+      ]
+    },
+    {
+      "id": "M1",
+      "title": "모델 생성자",
+      "questions": [
+        {
+          "id": "M1-01",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "선형 모델·kNN 생성자다. 빈칸 **(1)**–**(4)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\nLinearRegression()\nRidge(__(1)__=1.0)\nLasso(alpha=1.0, __(2)__=50000)\nLogisticRegression(max_iter=__(3)__)\nKNeighborsClassifier(__(4)__=k)\n```",
+          "blanks": [
+            [
+              "alpha"
+            ],
+            [
+              "max_iter"
+            ],
+            [
+              "2000"
+            ],
+            [
+              "n_neighbors"
+            ]
+          ],
+          "explanation": "규제 강도 `alpha`, 반복 상한 `max_iter`, 이웃 수 `n_neighbors`."
+        },
+        {
+          "id": "M1-02",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "트리 모델 생성자다. 빈칸 **(1)**–**(3)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\nDecisionTreeClassifier(__(1)__=depth, random_state=42)\nRandomForestClassifier(__(2)__=300, random_state=42)\nRandomForest__(3)__(n_estimators=300, random_state=42)   # 회귀\n```",
+          "blanks": [
+            [
+              "max_depth"
+            ],
+            [
+              "n_estimators"
+            ],
+            [
+              "Regressor"
+            ]
+          ],
+          "explanation": "결정트리는 깊이(`max_depth`), 랜덤포레스트는 트리 개수(`n_estimators`)를 정한다. 연속값 예측은 `RandomForestRegressor`."
+        },
+        {
+          "id": "M1-03",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "기준선·LightGBM 생성자다. 빈칸 **(1)**–**(4)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\nDummyRegressor(strategy=__(1)__)          # 회귀 기준선\nDummyClassifier(strategy=__(2)__)         # 분류 기준선\nlgb.__(3)__(n_estimators=300, verbose=__(4)__)\n```",
+          "blanks": [
+            [
+              "\"mean\""
+            ],
+            [
+              "\"most_frequent\""
+            ],
+            [
+              "LGBMRegressor"
+            ],
+            [
+              "-1"
+            ]
+          ],
+          "explanation": "회귀 기준선은 평균, 분류 기준선은 최빈 클래스를 예측한다. `verbose=-1`은 로그를 끈다."
+        },
+        {
+          "id": "M1-04",
+          "kind": "short",
+          "type": "코드 쓰기",
+          "prompt": "트리 300개, 시드 42인 랜덤포레스트 **회귀** 모델의 생성자를 쓰시오.",
+          "blanks": [
+            [
+              "RandomForestRegressor(n_estimators=300, random_state=42)",
+              "RandomForestRegressor(random_state=42, n_estimators=300)"
+            ]
+          ],
+          "explanation": "분류라면 `RandomForestClassifier`로 이름만 바뀐다."
+        },
+        {
+          "id": "M1-05",
+          "kind": "short",
+          "type": "코드 쓰기",
+          "prompt": "깊이 상한 `depth`, 시드 42인 결정트리 **분류** 모델의 생성자를 쓰시오.",
+          "blanks": [
+            [
+              "DecisionTreeClassifier(max_depth=depth, random_state=42)",
+              "DecisionTreeClassifier(random_state=42, max_depth=depth)"
+            ]
+          ],
+          "explanation": "깊이 인자는 `max_depth`."
+        },
+        {
+          "id": "M1-06",
+          "kind": "short",
+          "type": "코드 쓰기",
+          "prompt": "규제 강도 1.0, 최대 반복 50000인 Lasso 생성자를 쓰시오.",
+          "blanks": [
+            [
+              "Lasso(alpha=1.0, max_iter=50000)",
+              "Lasso(alpha=1, max_iter=50000)",
+              "Lasso(max_iter=50000, alpha=1.0)",
+              "Lasso(max_iter=50000, alpha=1)"
+            ]
+          ],
+          "explanation": "Ridge는 `Ridge(alpha=1.0)`만 썼다."
+        },
+        {
+          "id": "M1-07",
+          "kind": "short",
+          "type": "단답",
+          "prompt": "다음 모델의 클래스 이름을 쓰시오. **(1)** 회귀 기준선 **(2)** 분류 기준선 **(3)** 이웃 기반 분류기 **(4)** LightGBM 회귀",
+          "blanks": [
+            [
+              "DummyRegressor"
+            ],
+            [
+              "DummyClassifier"
+            ],
+            [
+              "KNeighborsClassifier"
+            ],
+            [
+              "LGBMRegressor",
+              "lgb.LGBMRegressor"
+            ]
+          ],
+          "explanation": "회귀는 Regressor, 분류는 Classifier로 끝난다(선형·로지스틱 회귀는 예외적으로 Regression)."
+        }
+      ]
+    },
+    {
+      "id": "M2",
+      "title": "실습에 나온 파라미터",
+      "questions": [
+        {
+          "id": "M2-01",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "실습에 나온 파라미터다. 빈칸 **(1)**–**(5)**에 들어갈 인자 이름을 쓰시오.",
+          "box": "```python\nLogisticRegression(max_iter=2000, __(1)__=\"balanced\")\nRandomForestClassifier(n_estimators=300, __(2)__=3,\n                       random_state=42, __(3)__=-1)\nPolynomialFeatures(__(4)__=2, __(5)__=False)\n```",
+          "blanks": [
+            [
+              "class_weight"
+            ],
+            [
+              "min_samples_leaf"
+            ],
+            [
+              "n_jobs"
+            ],
+            [
+              "degree"
+            ],
+            [
+              "include_bias"
+            ]
+          ],
+          "explanation": "소수 클래스 가중(`class_weight`), 잎 최소 샘플(`min_samples_leaf`), 병렬(`n_jobs=-1`), 다항 차수(`degree`), 상수항 제외(`include_bias=False`)."
+        },
+        {
+          "id": "M2-02",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "부스팅 생성자다. 빈칸 **(1)**–**(5)**에 들어갈 인자 이름을 쓰시오.",
+          "box": "```python\nxgb.XGBRegressor(n_estimators=2000, __(1)__=0.03, max_depth=5,\n                 __(2)__=0.8,              # 행 샘플링\n                 __(3)__=0.8,              # 열 샘플링\n                 __(4)__=100,              # 조기 종료\n                 random_state=42)\nlgb.LGBMRegressor(n_estimators=2000, learning_rate=0.03,\n                  __(5)__=31,              # 잎 개수\n                  subsample=0.8, subsample_freq=1,\n                  colsample_bytree=0.8, random_state=42, verbose=-1)\n```",
+          "blanks": [
+            [
+              "learning_rate"
+            ],
+            [
+              "subsample"
+            ],
+            [
+              "colsample_bytree"
+            ],
+            [
+              "early_stopping_rounds"
+            ],
+            [
+              "num_leaves"
+            ]
+          ],
+          "explanation": "행 샘플링 `subsample`, 열 샘플링 `colsample_bytree`. XGBoost는 조기 종료 라운드를 생성자에, LightGBM은 잎 수 `num_leaves`로 복잡도를 정한다."
+        },
+        {
+          "id": "M2-03",
+          "kind": "short",
+          "type": "단답",
+          "prompt": "다음 뜻의 파라미터 이름을 쓰시오. **(1)** 잎 하나의 최소 샘플 수 **(2)** LightGBM 트리의 잎 개수 **(3)** 사용할 CPU 코어 수 **(4)** 클래스별 가중치",
+          "blanks": [
+            [
+              "min_samples_leaf"
+            ],
+            [
+              "num_leaves"
+            ],
+            [
+              "n_jobs"
+            ],
+            [
+              "class_weight"
+            ]
+          ],
+          "explanation": "`min_samples_leaf`(sklearn 트리) ↔ `num_leaves`(LightGBM)를 헷갈리지 않는다."
+        },
+        {
+          "id": "M2-04",
+          "kind": "short",
+          "type": "단답",
+          "prompt": "다음 파라미터가 쓰인 클래스 이름을 쓰시오. **(1)** `class_weight=\"balanced\"` **(2)** `min_samples_leaf=3` **(3)** `num_leaves=31` **(4)** `degree=2, include_bias=False`",
+          "blanks": [
+            [
+              "LogisticRegression"
+            ],
+            [
+              "RandomForestClassifier"
+            ],
+            [
+              "LGBMRegressor",
+              "lgb.LGBMRegressor",
+              "LightGBM"
+            ],
+            [
+              "PolynomialFeatures"
+            ]
+          ],
+          "explanation": "불균형 대응은 로지스틱 회귀, 잎 최소 샘플은 랜덤포레스트, 잎 개수는 LightGBM, 차수는 다항 특징."
+        }
+      ]
+    },
+    {
+      "id": "E",
+      "title": "평가 함수",
+      "questions": [
+        {
+          "id": "E-01",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "회귀 평가 코드다. 빈칸 **(1)**–**(4)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\nmean_absolute_error(y_te, pred)          # MAE\n__(1)__(y_te, pred)                      # MSE\n__(2)__(y_te, pred)                      # RMSE\n__(3)__(y_te, pred)                      # R²\nrmse = np.__(4)__(mean_squared_error(y_te, pred))\n```",
+          "blanks": [
+            [
+              "mean_squared_error"
+            ],
+            [
+              "root_mean_squared_error"
+            ],
+            [
+              "r2_score"
+            ],
+            [
+              "sqrt"
+            ]
+          ],
+          "explanation": "RMSE는 `root_mean_squared_error`로 바로 구하거나 MSE에 `np.sqrt`를 씌운다."
+        },
+        {
+          "id": "E-02",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "분류 평가 코드다. 빈칸 **(1)**–**(4)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\n__(1)__(y_te, pred)                      # 정확도\n__(2)__(y_te, pred)                      # F1 (이진)\n__(3)__(y_te, pred, __(4)__=labels)      # 혼동행렬, 클래스 순서 지정\n```",
+          "blanks": [
+            [
+              "accuracy_score"
+            ],
+            [
+              "f1_score"
+            ],
+            [
+              "confusion_matrix"
+            ],
+            [
+              "labels"
+            ]
+          ],
+          "explanation": "혼동행렬의 행·열 순서는 `labels=`로 정한다."
+        },
+        {
+          "id": "E-03",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "다중 클래스의 F1을 등급별 F1의 단순 평균으로 구하는 코드 `f1_score(y_te, pred, ____=\"macro\")`의 빈칸에 들어갈 인자 이름을 쓰시오.",
+          "blanks": [
+            [
+              "average"
+            ]
+          ],
+          "explanation": "기본값 `average=\"binary\"`는 이진 분류에서만 동작한다."
+        },
+        {
+          "id": "E-04",
+          "kind": "short",
+          "type": "단답",
+          "prompt": "sklearn 평가 함수의 첫째 인자는 **(1)**, 둘째 인자는 **(2)**이다. 각각 \"정답\" 또는 \"예측\"으로 쓰시오.",
+          "blanks": [
+            [
+              "정답",
+              "실제",
+              "실제값",
+              "y_true",
+              "y_te"
+            ],
+            [
+              "예측",
+              "예측값",
+              "y_pred",
+              "pred"
+            ]
+          ],
+          "explanation": "`metric(y_true, y_pred)` — `mean_absolute_error(y_te, pred)`."
+        },
+        {
+          "id": "E-05",
+          "kind": "short",
+          "type": "코드 쓰기",
+          "prompt": "`mean_squared_error`와 numpy로 RMSE를 구해 `rmse`에 저장하는 코드를 한 줄로 쓰시오.",
+          "blanks": [
+            [
+              "rmse = np.sqrt(mean_squared_error(y_te, pred))",
+              "rmse = mean_squared_error(y_te, pred) ** 0.5"
+            ]
+          ],
+          "explanation": "MSE의 제곱근. 함수 하나로는 `root_mean_squared_error(y_te, pred)`."
+        },
+        {
+          "id": "E-06",
+          "kind": "short",
+          "type": "단답",
+          "prompt": "`confusion_matrix(y_te, pred)` 결과에서 행은 **(1)** 클래스, 열은 **(2)** 클래스다. 각각 \"실제\" 또는 \"예측\"으로 쓰시오.",
+          "blanks": [
+            [
+              "실제",
+              "정답"
+            ],
+            [
+              "예측"
+            ]
+          ],
+          "explanation": "대각선은 맞힌 개수, 행 하나를 따라가면 그 실제 클래스가 어디로 예측됐는지 보인다."
+        }
+      ]
+    },
+    {
+      "id": "P1",
+      "title": "⑦ IQR 이상치 처리",
+      "questions": [
+        {
+          "id": "P1-01",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "IQR 이상치 처리 코드다. 빈칸 **(1)**–**(7)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\nq1, q3 = df[\"col\"].__(1)__([__(2)__, __(3)__])\niqr = q3 - q1\nupper = q3 + __(4)__ * iqr\nn_out = (df[\"col\"] > upper).__(5)__()\ndf = df[(df[\"col\"] <= upper) __(6)__ df[\"col\"].__(7)__()].reset_index(drop=True)\n```",
+          "blanks": [
+            [
+              "quantile"
+            ],
+            [
+              "0.25",
+              ".25"
+            ],
+            [
+              "0.75",
+              ".75"
+            ],
+            [
+              "1.5"
+            ],
+            [
+              "sum"
+            ],
+            [
+              "|"
+            ],
+            [
+              "isna",
+              "isnull"
+            ]
+          ],
+          "explanation": "사분위수 → IQR → 상한 → 개수 세기 → 상한 이하 **또는** 결측인 행만 남기기."
+        },
+        {
+          "id": "P1-02",
+          "kind": "short",
+          "type": "코드 쓰기",
+          "prompt": "`q1`, `q3`로 IQR 규칙의 상한 `upper`를 구하는 코드를 한 줄로 쓰시오.",
+          "blanks": [
+            [
+              "upper = q3 + 1.5 * (q3 - q1)",
+              "upper = q3 + 1.5 * iqr",
+              "upper = q3 + (q3 - q1) * 1.5"
+            ]
+          ],
+          "explanation": "상한 = Q3 + 1.5 × (Q3 − Q1)."
+        },
+        {
+          "id": "P1-03",
+          "kind": "short",
+          "type": "코드 쓰기",
+          "prompt": "`col`이 상한 `upper`를 넘는 행의 개수를 `n_out`에 저장하는 코드를 한 줄로 쓰시오.",
+          "blanks": [
+            [
+              "n_out = (df[\"col\"] > upper).sum()"
+            ]
+          ],
+          "explanation": "불리언 Series의 합 = True의 개수."
+        },
+        {
+          "id": "P1-04",
+          "kind": "short",
+          "type": "계산",
+          "prompt": "대여건수의 Q1 = 100, Q3 = 300일 때 IQR 규칙의 상한은?",
+          "blanks": [
+            [
+              "600"
+            ]
+          ],
+          "explanation": "IQR = 200, 상한 = 300 + 1.5 × 200 = 600."
+        },
+        {
+          "id": "P1-05",
+          "kind": "short",
+          "type": "단답",
+          "prompt": "`df[\"col\"]`이 NaN인 행에서 `df[\"col\"] <= upper`의 결과는?",
+          "blanks": [
+            [
+              "False",
+              "거짓"
+            ]
+          ],
+          "explanation": "NaN과의 비교는 항상 False다. 그래서 결측 행을 남기려면 `| df[\"col\"].isna()`를 붙인다."
+        }
+      ]
+    },
+    {
+      "id": "P2",
+      "title": "⑧ 원-핫 인코딩·컬럼 정렬",
+      "questions": [
+        {
+          "id": "P2-01",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "원-핫 인코딩과 컬럼 정렬 코드다. 빈칸 **(1)**–**(6)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\nX_tr = pd.__(1)__(train.drop(__(2)__=[target]), __(3)__=cat_cols)\nX_te = pd.get_dummies(test.drop(columns=[target]), columns=cat_cols)\nX_te = X_te.__(4)__(columns=__(5)__, __(6)__=0)\n```",
+          "blanks": [
+            [
+              "get_dummies"
+            ],
+            [
+              "columns"
+            ],
+            [
+              "columns"
+            ],
+            [
+              "reindex"
+            ],
+            [
+              "X_tr.columns"
+            ],
+            [
+              "fill_value"
+            ]
+          ],
+          "explanation": "정답 열은 `drop(columns=…)`로 빼고, 인코딩할 열은 `columns=`로 지정한다. 테스트 열은 훈련 열(`X_tr.columns`)에 맞추고 없는 열은 0."
+        },
+        {
+          "id": "P2-02",
+          "kind": "short",
+          "type": "코드 쓰기",
+          "prompt": "`X_te`의 열을 `X_tr`의 열 구성·순서에 맞추고, 없는 열은 0으로 채우는 코드를 한 줄로 쓰시오.",
+          "blanks": [
+            [
+              "X_te = X_te.reindex(columns=X_tr.columns, fill_value=0)"
+            ]
+          ],
+          "explanation": "기준은 훈련 열. `fill_value=0`은 '그 범주가 아님'."
+        },
+        {
+          "id": "P2-03",
+          "kind": "short",
+          "type": "단답",
+          "prompt": "`X_te.reindex(columns=X_tr.columns, fill_value=0)` 뒤, 훈련에만 있던 열은 **(1)**(으)로 채워지고, 테스트에만 있던 열은 **(2)**. (2)에는 \"남는다\" 또는 \"사라진다\"로 쓰시오.",
+          "blanks": [
+            [
+              "0"
+            ],
+            [
+              "사라진다",
+              "사라짐",
+              "삭제",
+              "제거",
+              "버려진다",
+              "없어진다"
+            ]
+          ],
+          "explanation": "`reindex`는 지정한 열만 남기고, 없던 열은 `fill_value`로 만든다."
+        }
+      ]
+    },
+    {
+      "id": "P3",
+      "title": "⑨ 다항회귀 파이프라인",
+      "questions": [
+        {
+          "id": "P3-01",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "2차 다항회귀 파이프라인이다. 빈칸 **(1)**–**(4)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\nmodel = make_pipeline(\n    __(1)__(degree=2, __(2)__=False),\n    __(3)__(),\n    __(4)__())\n```",
+          "blanks": [
+            [
+              "PolynomialFeatures"
+            ],
+            [
+              "include_bias"
+            ],
+            [
+              "StandardScaler"
+            ],
+            [
+              "LinearRegression"
+            ]
+          ],
+          "explanation": "특징 늘리기 → 스케일 맞추기 → 모델."
+        },
+        {
+          "id": "P3-02",
+          "kind": "short",
+          "type": "계산",
+          "prompt": "특징 [a, b]에 `PolynomialFeatures(degree=2, include_bias=False)`를 적용하면 열이 **(1)**개, `include_bias=True`(기본)면 **(2)**개가 된다.",
+          "blanks": [
+            [
+              "5"
+            ],
+            [
+              "6"
+            ]
+          ],
+          "explanation": "a, b, a², ab, b² — 5개. bias를 넣으면 상수 1 열이 더해져 6개."
+        },
+        {
+          "id": "P3-03",
+          "kind": "short",
+          "type": "코드 쓰기",
+          "prompt": "2차 다항 특징(상수항 제외) → 표준화 → 선형회귀 파이프라인을 만드는 `make_pipeline(...)` 코드를 쓰시오.",
+          "blanks": [
+            [
+              "make_pipeline(PolynomialFeatures(degree=2, include_bias=False), StandardScaler(), LinearRegression())"
+            ]
+          ],
+          "explanation": "단계는 괄호를 붙인 객체로, 실행 순서대로."
+        }
+      ]
+    },
+    {
+      "id": "P4",
+      "title": "⑩ 교차검증",
+      "questions": [
+        {
+          "id": "P4-01",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "교차검증 코드다. 빈칸 **(1)**–**(8)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\nkf = __(1)__(__(2)__=5, __(3)__=True, random_state=42)\ntscv = __(4)__(n_splits=5)\nscores = __(5)__cross_val_score(\n    model, X, y,\n    __(6)__=kf,\n    scoring=__(7)__)\nprint(scores.__(8)__(), scores.std())\n```",
+          "blanks": [
+            [
+              "KFold"
+            ],
+            [
+              "n_splits"
+            ],
+            [
+              "shuffle"
+            ],
+            [
+              "TimeSeriesSplit"
+            ],
+            [
+              "-"
+            ],
+            [
+              "cv"
+            ],
+            [
+              "\"neg_mean_absolute_error\""
+            ],
+            [
+              "mean"
+            ]
+          ],
+          "explanation": "점수는 '클수록 좋음'이라 음수 MAE가 나오고, 앞의 `-`로 양수 MAE를 만든다."
+        },
+        {
+          "id": "P4-02",
+          "kind": "short",
+          "type": "코드 쓰기",
+          "prompt": "모델 `model`, 데이터 `X`, `y`, 분할 객체 `kf`로 폴드별 MAE(양수) 배열 `scores`를 구하는 코드를 한 줄로 쓰시오.",
+          "blanks": [
+            [
+              "scores = -cross_val_score(model, X, y, cv=kf, scoring=\"neg_mean_absolute_error\")"
+            ]
+          ],
+          "explanation": "`scoring=\"neg_mean_absolute_error\"` + 앞의 `-`."
+        },
+        {
+          "id": "P4-03",
+          "kind": "short",
+          "type": "단답",
+          "prompt": "`cross_val_score`로 MAE를 구할 때 `scoring=`에 넣는 문자열을 쓰시오.",
+          "blanks": [
+            [
+              "neg_mean_absolute_error"
+            ]
+          ],
+          "explanation": "오차 지표는 `neg_` 접두사가 붙어 음수로 돌아온다."
+        },
+        {
+          "id": "P4-04",
+          "kind": "short",
+          "type": "단답",
+          "prompt": "시간 순서를 지켜 과거로 학습하고 미래로 검증하는 sklearn 분할 클래스 이름을 쓰시오.",
+          "blanks": [
+            [
+              "TimeSeriesSplit"
+            ]
+          ],
+          "explanation": "`TimeSeriesSplit(n_splits=5)` — `shuffle`이 없다."
+        }
+      ]
+    },
+    {
+      "id": "P5",
+      "title": "⑪ 하이퍼파라미터 탐색",
+      "questions": [
+        {
+          "id": "P5-01",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "RandomizedSearchCV 코드다. 빈칸 **(1)**–**(5)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\nsearch = __(1)__(\n    model,\n    __(2)__=param_dist,\n    __(3)__=25,\n    cv=tscv,\n    scoring=\"neg_mean_absolute_error\",\n    random_state=42,\n    n_jobs=-1)\nsearch.__(4)__(X, y)\nbest = search.__(5)__\n```",
+          "blanks": [
+            [
+              "RandomizedSearchCV"
+            ],
+            [
+              "param_distributions"
+            ],
+            [
+              "n_iter"
+            ],
+            [
+              "fit"
+            ],
+            [
+              "best_estimator_"
+            ]
+          ],
+          "explanation": "후보 사전은 `param_distributions`, 평가할 조합 수는 `n_iter`. 재학습된 최적 모델은 `best_estimator_`."
+        },
+        {
+          "id": "P5-02",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "Optuna 목적 함수다. 빈칸 **(1)**–**(5)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\ndef objective(trial):\n    params = {\n        \"num_leaves\": trial.__(1)__(\"num_leaves\", 15, 127),\n        \"learning_rate\": trial.__(2)__(\"learning_rate\", 0.01, 0.1, __(3)__=True),\n    }\n    trial_model = lgb.LGBMRegressor(**params, verbose=-1, random_state=42)\n    score = cross_val_score(trial_model, X, y, cv=tscv,\n                            scoring=\"neg_mean_absolute_error\").__(4)__()\n    return __(5)__score\n```",
+          "blanks": [
+            [
+              "suggest_int"
+            ],
+            [
+              "suggest_float"
+            ],
+            [
+              "log"
+            ],
+            [
+              "mean"
+            ],
+            [
+              "-"
+            ]
+          ],
+          "explanation": "정수는 `suggest_int`, 실수는 `suggest_float`(학습률은 `log=True`). 폴드 평균 음수 MAE에 `-`를 붙여 MAE를 돌려준다."
+        },
+        {
+          "id": "P5-03",
+          "kind": "short",
+          "type": "단답",
+          "prompt": "탐색 객체 `search`의 속성 이름을 쓰시오. **(1)** 최적 파라미터 사전 **(2)** 최고 교차검증 점수 **(3)** 최적 파라미터로 재학습된 모델",
+          "blanks": [
+            [
+              "best_params_"
+            ],
+            [
+              "best_score_"
+            ],
+            [
+              "best_estimator_"
+            ]
+          ],
+          "explanation": "학습 뒤 생기는 속성이라 모두 밑줄(`_`)로 끝난다."
+        }
+      ]
+    },
+    {
+      "id": "P6",
+      "title": "⑫ XGBoost·LightGBM 조기 종료",
+      "questions": [
+        {
+          "id": "P6-01",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "조기 종료용 검증 세트를 떼는 코드다. 빈칸 **(1)**–**(3)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\ncut = __(1)__(len(X_tr) * 0.8)\nX_fit, X_val = X_tr.__(2)__[:cut], X_tr.iloc[__(3)__]\ny_fit, y_val = y_tr.iloc[:cut], y_tr.iloc[cut:]\n```",
+          "blanks": [
+            [
+              "int"
+            ],
+            [
+              "iloc"
+            ],
+            [
+              "cut:"
+            ]
+          ],
+          "explanation": "`iloc` 슬라이싱은 정수만 받는다. 앞 80%는 `[:cut]`, 뒤 20%는 `[cut:]`."
+        },
+        {
+          "id": "P6-02",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "XGBoost·LightGBM 조기 종료 학습 코드다. 빈칸 **(1)**–**(5)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\nxgb_model.fit(\n    X_fit, y_fit,\n    __(1)__=[(X_val, y_val)],\n    verbose=False)\nlgb_model.fit(\n    X_fit, y_fit,\n    eval_set=[(__(2)__, __(3)__)],\n    __(4)__=[lgb.__(5)__(100, verbose=False)])\n```",
+          "blanks": [
+            [
+              "eval_set"
+            ],
+            [
+              "X_val"
+            ],
+            [
+              "y_val"
+            ],
+            [
+              "callbacks"
+            ],
+            [
+              "early_stopping"
+            ]
+          ],
+          "explanation": "검증 세트는 둘 다 `eval_set=[(X_val, y_val)]`. LightGBM은 콜백 리스트에 `lgb.early_stopping(100)`을 넣는다."
+        },
+        {
+          "id": "P6-03",
+          "kind": "short",
+          "type": "단답",
+          "prompt": "XGBoost에서 조기 종료 라운드 수는 **(1)**(생성자 / `fit`)에 넣고, 그 인자 이름은 **(2)**이다.",
+          "blanks": [
+            [
+              "생성자",
+              "constructor"
+            ],
+            [
+              "early_stopping_rounds"
+            ]
+          ],
+          "explanation": "`xgb.XGBRegressor(..., early_stopping_rounds=100)`. LightGBM은 `fit`의 `callbacks`."
+        },
+        {
+          "id": "P6-04",
+          "kind": "short",
+          "type": "코드 쓰기",
+          "prompt": "LightGBM 모델 `lgb_model`을 `X_fit`, `y_fit`으로 학습하면서 `X_val`, `y_val`로 감시해 100라운드 개선이 없으면 멈추는 `fit` 코드를 쓰시오. (조기 종료 로그는 끈다)",
+          "blanks": [
+            [
+              "lgb_model.fit(X_fit, y_fit, eval_set=[(X_val, y_val)], callbacks=[lgb.early_stopping(100, verbose=False)])",
+              "lgb_model.fit(X_fit, y_fit, eval_set=[(X_val, y_val)], callbacks=[lgb.early_stopping(stopping_rounds=100, verbose=False)])"
+            ]
+          ],
+          "explanation": "`eval_set`은 튜플의 리스트, `callbacks`도 리스트."
+        }
+      ]
+    },
+    {
+      "id": "L",
+      "title": "저빈도 항목 (순환 특징·냉방도일·중요도·시각화)",
+      "questions": [
+        {
+          "id": "L-01",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "시각 순환 특징 코드다. 빈칸 **(1)**–**(4)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\ndf[\"시간_sin\"] = np.__(1)__(2 * np.pi * df[\"시간\"] / __(2)__)\ndf[\"시간_cos\"] = np.__(3)__(2 * np.__(4)__ * df[\"시간\"] / 24)\n```",
+          "blanks": [
+            [
+              "sin"
+            ],
+            [
+              "24"
+            ],
+            [
+              "cos"
+            ],
+            [
+              "pi"
+            ]
+          ],
+          "explanation": "한 주기(24시간)를 2π 각도로 바꿔 원 위의 점으로 놓는다."
+        },
+        {
+          "id": "L-02",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "냉방도일 특징 코드다. 빈칸 **(1)**–**(3)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\nX_tr2 = X_tr.__(1)__()\nX_tr2[\"냉방도일\"] = np.__(2)__(train[\"평균기온\"] - 24, 0, __(3)__)\n```",
+          "blanks": [
+            [
+              "copy"
+            ],
+            [
+              "clip"
+            ],
+            [
+              "None"
+            ]
+          ],
+          "explanation": "원본을 건드리지 않게 복사한 뒤, 24도를 넘는 만큼만 남기고 음수는 0으로 깎는다(상한 없음 = `None`)."
+        },
+        {
+          "id": "L-03",
+          "kind": "short",
+          "type": "계산",
+          "prompt": "`np.clip(x - 24, 0, None)`은 x = 27일 때 **(1)**, x = 18일 때 **(2)**이다.",
+          "blanks": [
+            [
+              "3"
+            ],
+            [
+              "0"
+            ]
+          ],
+          "explanation": "27 − 24 = 3, 18 − 24 = −6 → 하한 0으로 깎임."
+        },
+        {
+          "id": "L-04",
+          "kind": "short",
+          "type": "빈칸",
+          "prompt": "특징 중요도와 잔차 그림 코드다. 빈칸 **(1)**–**(4)**에 들어갈 코드를 쓰시오.",
+          "box": "```python\nimp = pd.Series(rf.__(1)__, index=X_tr.columns).sort_values(ascending=False)\nresid = y_te - pred\nplt.__(2)__(pred, resid, s=8, __(3)__=0.5)\nplt.__(4)__(0, color=\"red\", lw=1)\n```",
+          "blanks": [
+            [
+              "feature_importances_"
+            ],
+            [
+              "scatter"
+            ],
+            [
+              "alpha"
+            ],
+            [
+              "axhline"
+            ]
+          ],
+          "explanation": "중요도는 학습 뒤 생기는 속성(밑줄로 끝남). 산점도는 `scatter`, 수평 기준선은 `axhline`."
+        },
+        {
+          "id": "L-05",
+          "kind": "short",
+          "type": "숫자",
+          "prompt": "순환 특징 `2 * np.pi * x / T`에서 요일(0–6)이면 T = **(1)**, 월(1–12)이면 T = **(2)**이다.",
+          "blanks": [
+            [
+              "7"
+            ],
+            [
+              "12"
+            ]
+          ],
+          "explanation": "T는 한 주기의 길이."
+        }
+      ]
+    },
+    {
+      "id": "X",
+      "title": "헷갈리는 인자 대조",
+      "questions": [
+        {
+          "id": "X-01",
+          "kind": "short",
+          "type": "단답",
+          "prompt": "스케일러에서 **(1)** 훈련 데이터에 쓰는 메서드와 **(2)** 테스트 데이터에 쓰는 메서드를 쓰시오.",
+          "blanks": [
+            [
+              "fit_transform"
+            ],
+            [
+              "transform"
+            ]
+          ],
+          "explanation": "기준은 훈련에서 한 번만 구한다."
+        },
+        {
+          "id": "X-02",
+          "kind": "short",
+          "type": "단답",
+          "prompt": "**(1)** `dropna`에서 결측을 볼 열을 지정하는 인자와 **(2)** `drop`·`get_dummies`·`reindex`에서 열을 지정하는 인자의 이름을 쓰시오.",
+          "blanks": [
+            [
+              "subset"
+            ],
+            [
+              "columns"
+            ]
+          ],
+          "explanation": "`dropna(subset=[...])` ↔ `drop(columns=[...])`."
+        },
+        {
+          "id": "X-03",
+          "kind": "short",
+          "type": "단답",
+          "prompt": "트리 모델에서 **(1)** 트리 하나의 깊이 상한과 **(2)** 트리 개수를 정하는 인자 이름을 쓰시오.",
+          "blanks": [
+            [
+              "max_depth"
+            ],
+            [
+              "n_estimators"
+            ]
+          ],
+          "explanation": "결정트리는 `max_depth`, 앙상블은 `n_estimators`도 정한다."
+        },
+        {
+          "id": "X-04",
+          "kind": "short",
+          "type": "단답",
+          "prompt": "**(1)** LogisticRegression·Lasso의 최적화 반복 상한과 **(2)** RandomizedSearchCV가 평가할 후보 조합 수를 정하는 인자 이름을 쓰시오.",
+          "blanks": [
+            [
+              "max_iter"
+            ],
+            [
+              "n_iter"
+            ]
+          ],
+          "explanation": "`max_iter=2000` / `n_iter=25`."
+        },
+        {
+          "id": "X-05",
+          "kind": "short",
+          "type": "단답",
+          "prompt": "**(1)** LightGBM 로그를 끄는 인자와 값, **(2)** 모든 CPU 코어로 병렬 계산하는 인자와 값을 `이름=값` 꼴로 쓰시오.",
+          "blanks": [
+            [
+              "verbose=-1"
+            ],
+            [
+              "n_jobs=-1"
+            ]
+          ],
+          "explanation": "둘 다 −1이지만 뜻이 다르다."
+        }
+      ]
+    }
+  ]
+}
