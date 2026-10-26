@@ -1,0 +1,188 @@
+{
+  "$schema": "./exam.schema.json",
+  "id": "machine-learning-2026-2-mock-3",
+  "title": "머신러닝응용 기출형 모의고사 제3회",
+  "course": "머신러닝응용 · 2026-2학기",
+  "description": "공지 형식(서술 2 + 실습코드 2, 각 25점). 선형회귀·규제 / 교차검증·누수·튜닝 / 8주차 빈칸 / 4강 실습 코드 작성.",
+  "tags": [
+    "머신러닝",
+    "모의고사",
+    "기출형"
+  ],
+  "updated": "2026-10-26",
+  "sections": [
+    {
+      "id": "M3-E",
+      "title": "Ⅰ. 서술형 (각 25점)",
+      "questions": [
+        {
+          "id": "M3-1",
+          "kind": "essay",
+          "type": "4강 · 서술",
+          "points": 25,
+          "prompt": "일별 최대전력수요를 기온·습도·요일·휴일여부로 예측했다.\n\n(1) 선형회귀의 작동 원리를 쓰고, 기온 하나만 직선으로 넣었을 때 성능이 낮은 이유를 쓰시오. (7점)\n(2) 이를 해결한 두 가지 방법(도메인 특징, 다항 특징)과 각각에 필요한 전처리를 쓰시오. (7점)\n(3) 5차 다항 특징에 규제 없음 / Ridge / Lasso를 적용한 결과로 규제의 원리와 각 모델의 장단점을 쓰시오. (11점)",
+          "box": "| 모델 (전력수요, 테스트 184일) | 테스트 MAE | RMSE | R² |\n|---|---|---|---|\n| 기준선 (항상 train 평균) | 4,695 | – | −0.016 |\n| 선형회귀 (기온·습도·요일·휴일) | 3,601 | 4,923 | 0.364 |\n| 선형회귀 + 냉방도일·난방도일 | 2,000 | 2,487 | 0.838 |\n| 2차 다항회귀 | 2,087 | – | 0.828 |\n\n| 5차 다항 (특징 4 → 125개) | 훈련 MAE | 테스트 MAE |\n|---|---|---|\n| 규제 없음 | 1,609 | 2,183 |\n| Ridge (α=1) | 1,685 | 2,006 |\n| Lasso (α=1) | 1,672 | 2,000 |",
+          "modelAnswer": "(1) 예측값을 입력의 가중치 합으로 나타내고, 잔차 제곱합이 최소가 되는 가중치를 최소제곱법(닫힌 해)으로 구한다. 그런데 기온과 수요는 추우면 난방, 더우면 냉방 때문에 **U자 관계**라 직선 하나로는 표현할 수 없다(과소적합) — 기온 계수가 의미를 잃고 R² 0.364, MAE 3,601에 머문다.\n\n(2) **도메인 특징**: 냉방도일 = max(기온 − 24, 0), 난방도일 = max(10 − 기온, 0)을 `np.clip`으로 만들어 꺾인 선을 가중치 합으로 표현 → MAE 2,000, R² 0.838. train·test 각각의 기온으로 만들되 기준값 24·10은 상수라 누수가 없다. **다항 특징**: `PolynomialFeatures(degree=2, include_bias=False)`로 기온² 등을 추가 → MAE 2,087. 값의 범위가 커지므로 **StandardScaler**와 파이프라인으로 묶어 train에만 fit한다.\n\n(3) 규제는 손실에 가중치 크기 벌점을 더해 모델을 단순하게 유지한다. Ridge(L2, α·Σw²)는 가중치를 골고루 줄이고, Lasso(L1, α·Σ|w|)는 일부를 정확히 0으로 만들어 특징을 고른다. α가 크면 단순(과소적합), 0이면 규제 없음. **규제 없음**: 훈련 1,609 / 테스트 2,183으로 간격이 큰 과적합 — 특징 125개가 잡음까지 외움. **Ridge**: 테스트 2,006으로 개선, 상관 높은 특징에 안정적이지만 특징 수는 그대로라 해석이 어렵다. **Lasso**: 테스트 2,000, 125개 중 43개만 남겨 단순·해석 쉬움, α에 민감하다. 그래도 도메인 특징 2개 모델(2,000)과 비슷해, 해석 쉬운 도메인 특징 모델이 최종 선택으로 적절하다.",
+          "keyPoints": [
+            {
+              "text": "가중치 합 + 최소제곱(잔차 제곱합 최소)",
+              "points": 3
+            },
+            {
+              "text": "U자 관계라 직선으로 과소적합 (R² 0.364, MAE 3,601)",
+              "points": 4
+            },
+            {
+              "text": "냉난방도일 np.clip → MAE 2,000",
+              "points": 4
+            },
+            {
+              "text": "다항 특징 + StandardScaler 파이프라인(train만 fit)",
+              "points": 3
+            },
+            {
+              "text": "규제 원리: Ridge L2 골고루 축소 / Lasso L1 일부 0, α 방향",
+              "points": 4
+            },
+            {
+              "text": "규제 없음 1,609 vs 2,183 과적합",
+              "points": 3
+            },
+            {
+              "text": "Ridge 2,006 / Lasso 2,000(43/125) 장단점",
+              "points": 4
+            }
+          ]
+        },
+        {
+          "id": "M3-2",
+          "kind": "essay",
+          "type": "8강 · 서술",
+          "points": 25,
+          "prompt": "익일 PM2.5 예측(LightGBM)에서 검증 방법별 점수를 비교했다.\n\n(1) 홀드아웃 한 번의 점수를 믿으면 안 되는 이유와 K-Fold 교차검증의 절차·보고 방법을 쓰시오. (7점)\n(2) 이 데이터에서 무작위 KFold보다 TimeSeriesSplit이 적절한 이유를 결과와 함께 쓰시오. (6점)\n(3) '타깃 누수 특징' 실험 결과의 의미와 누수 세 유형의 차단법을 쓰시오. (6점)\n(4) 튜닝 결과를 근거로 랜덤 서치와 베이지안 최적화의 장단점을 쓰고, 튜닝 과정에서 테스트 세트를 어떻게 다뤄야 하는지 쓰시오. (6점)",
+          "box": "| 검증 방법 (LightGBM, 익일 PM2.5) | MAE |\n|---|---|\n| 홀드아웃 1회 (분할 시드 0–4) | 7.387 / 7.061 / 7.102 / 7.241 / 6.173 |\n| 무작위 5-Fold CV | 6.743 ± 0.377 |\n| 5-Fold CV + 타깃 누수 특징 | 2.331 |\n| TimeSeriesSplit(5) CV | 7.382 ± 1.151 |\n| 기본 LightGBM → 테스트 | 5.730 |\n| RandomizedSearchCV(n_iter=25, cv=TSS) → 테스트 | 4.818 |\n| Optuna 25 trial (cv=TSS) → 테스트 | 4.831 |",
+          "modelAnswer": "(1) 같은 모델·데이터인데 분할 시드만 바꿔도 MAE가 6.173 – 7.387로 출렁인다 — 어떤 표본이 테스트에 들어가느냐는 운이다. K-Fold는 데이터를 K조각으로 나눠 한 조각씩 돌아가며 검증하고 나머지로 훈련해 모든 데이터가 한 번씩 검증에 쓰이게 한다. 점수 K개의 **평균 ± 표준편차**로 보고한다(6.743 ± 0.377). 개선폭이 표준편차 안이면 개선이 아니다.\n\n(2) 날짜 순서가 있는 데이터를 무작위로 섞으면 미래 날로 훈련하고 과거 날을 검증하게 되어 이웃 날의 정보가 새어 점수가 낙관적이다(무작위 KFold 6.743 < TSS 7.382). TimeSeriesSplit은 항상 과거로 훈련하고 그다음 구간으로 검증해 실전(미래 예측)과 같은 조건이다.\n\n(3) 타깃을 섞은 특징을 넣자 CV MAE가 2.331로 비정상적으로 좋아졌다 — 실력이 아니라 **누수 경보**다. 실전에선 그 특징을 알 수 없어 점수가 무너진다. 차단: ① 전처리 누수 → Pipeline으로 폴드마다 훈련 부분에만 fit, ② 시간 누수 → 시간순 분할·그 시점에 알 수 있는 특징만(lag는 shift(1)), ③ 타깃 누수 → 특징 생성 시점 점검, 중요도 1위가 상식 밖이면 조사.\n\n(4) 기본 LightGBM 테스트 MAE 5.730 → 랜덤 서치 4.818, Optuna 4.831. **랜덤 서치**: 3,072개 조합 중 25개만 무작위로 시도해 그리드보다 효율적, 단 이전 결과를 활용하지 않는다. **베이지안(Optuna)**: 이전 시도 결과로 유망 지역을 골라 같은 횟수로 더 빨리 수렴하는 경우가 많지만, 초기 몇 회는 무작위라 적은 예산에선 차이가 작다(이번엔 비슷). 둘 다 **cv=TimeSeriesSplit 위에서** 훈련 데이터로만 고르고, 테스트는 마지막에 한 번만 평가한다.",
+          "keyPoints": [
+            {
+              "text": "홀드아웃 시드에 따라 6.173 – 7.387 → 운",
+              "points": 3
+            },
+            {
+              "text": "K-Fold 절차 + 평균 ± 표준편차 보고",
+              "points": 4
+            },
+            {
+              "text": "시계열 무작위 KFold는 낙관적(6.743 < 7.382), TSS는 과거→미래",
+              "points": 6
+            },
+            {
+              "text": "누수 특징 CV 2.331 = 경보",
+              "points": 3
+            },
+            {
+              "text": "누수 3유형 차단법(Pipeline·시간순·생성 시점)",
+              "points": 3
+            },
+            {
+              "text": "튜닝 결과 5.730 → 4.818 / 4.831, 랜덤 vs 베이지안 장단점",
+              "points": 4
+            },
+            {
+              "text": "TSS 위에서 튜닝, test는 마지막 1회",
+              "points": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M3-C",
+      "title": "Ⅱ. 실습코드 (각 25점)",
+      "questions": [
+        {
+          "id": "M3-3",
+          "kind": "short",
+          "type": "8주차 · 코드 빈칸",
+          "points": 25,
+          "prompt": "다음은 8주차 교차검증·튜닝 코드다. 빈칸 **(1)**–**(10)** 을 채우시오.",
+          "box": "```python\nmodel = lgb.LGBMRegressor(n_estimators=300, verbose=-1, random_state=42)\nkf = __(1)__(n_splits=5, shuffle=__(2)__, random_state=42)\nscores = -__(3)__(model, X, y, cv=kf, scoring=\"__(4)__\")\nprint(f\"MAE = {scores.mean():.3f} ± {scores.__(5)__():.3f}\")\n\npipe = __(6)__(StandardScaler(), lgb.LGBMRegressor(n_estimators=300, verbose=-1, random_state=42))\nscores_pipe = -cross_val_score(pipe, X, y, cv=kf, scoring=\"neg_mean_absolute_error\")\n\ntscv = __(7)__(n_splits=5)\nsearch = RandomizedSearchCV(\n    lgb.LGBMRegressor(verbose=-1, random_state=42, subsample_freq=1),\n    param_distributions=param_dist, __(8)__=25, cv=tscv,\n    scoring=\"neg_mean_absolute_error\", random_state=42, n_jobs=-1)\nsearch.fit(X, y)\nprint(search.__(9)__, -search.best_score_)\nbest = search.__(10)__\nprint(mean_absolute_error(y_te, best.predict(X_te)))\n```",
+          "blanks": [
+            [
+              "KFold"
+            ],
+            [
+              "True"
+            ],
+            [
+              "cross_val_score"
+            ],
+            [
+              "neg_mean_absolute_error"
+            ],
+            [
+              "std"
+            ],
+            [
+              "make_pipeline"
+            ],
+            [
+              "TimeSeriesSplit"
+            ],
+            [
+              "n_iter"
+            ],
+            [
+              "best_params_"
+            ],
+            [
+              "best_estimator_"
+            ]
+          ],
+          "explanation": "`KFold(shuffle=True)`, `cross_val_score`의 오차 scoring은 `neg_mean_absolute_error`(앞에 `-`), 보고는 mean ± std. 전처리는 `make_pipeline` 안에, 시계열은 `TimeSeriesSplit`. 랜덤 서치는 `n_iter`, 결과는 `best_params_`, 재학습된 모델은 `best_estimator_`."
+        },
+        {
+          "id": "M3-4",
+          "kind": "essay",
+          "type": "4강 실습 · 코드 작성",
+          "points": 25,
+          "prompt": "전력 데이터 `train`, `test`(열: 평균기온, 평균습도, 요일, 휴일여부, 최대전력수요_MW)로 다음 코드를 작성하시오.\n\n(1) 평균 예측 기준선과 선형회귀의 테스트 MAE, 선형회귀의 RMSE·R²와 계수 출력 (8점)\n(2) 냉방도일·난방도일을 추가한 선형회귀(원본을 변경하지 말 것)의 MAE 출력 (7점)\n(3) 5차 다항 + 표준화 + {규제 없음, Ridge(α=1), Lasso(α=1)}의 훈련·테스트 MAE 비교 (10점)",
+          "modelAnswer": "```python\nfeatures = [\"평균기온\", \"평균습도\", \"요일\", \"휴일여부\"]; target = \"최대전력수요_MW\"\nX_tr, y_tr = train[features], train[target]\nX_te, y_te = test[features], test[target]\n\nbase = DummyRegressor(strategy=\"mean\").fit(X_tr, y_tr)                         # (1)\nprint(mean_absolute_error(y_te, base.predict(X_te)))\nmodel = LinearRegression().fit(X_tr, y_tr)\npred = model.predict(X_te)\nprint(mean_absolute_error(y_te, pred), np.sqrt(mean_squared_error(y_te, pred)), r2_score(y_te, pred))\nprint(dict(zip(features, model.coef_)), model.intercept_)\n\nX_tr2, X_te2 = X_tr.copy(), X_te.copy()                                       # (2)\nfor X2, src in [(X_tr2, train), (X_te2, test)]:\n    X2[\"냉방도일\"] = np.clip(src[\"평균기온\"] - 24, 0, None)\n    X2[\"난방도일\"] = np.clip(10 - src[\"평균기온\"], 0, None)\nmodel2 = LinearRegression().fit(X_tr2, y_tr)\nprint(mean_absolute_error(y_te, model2.predict(X_te2)))\n\nfor name, reg in [(\"규제없음\", LinearRegression()), (\"Ridge\", Ridge(alpha=1.0)),   # (3)\n                  (\"Lasso\", Lasso(alpha=1.0, max_iter=50000))]:\n    m = make_pipeline(PolynomialFeatures(degree=5, include_bias=False), StandardScaler(), reg)\n    m.fit(X_tr, y_tr)\n    print(name, mean_absolute_error(y_tr, m.predict(X_tr)), mean_absolute_error(y_te, m.predict(X_te)))\n```",
+          "keyPoints": [
+            {
+              "text": "DummyRegressor(strategy='mean') 기준선 MAE",
+              "points": 2
+            },
+            {
+              "text": "LinearRegression + MAE·np.sqrt(MSE)·r2_score",
+              "points": 4
+            },
+            {
+              "text": "coef_ / intercept_ 출력",
+              "points": 2
+            },
+            {
+              "text": ".copy() 후 np.clip으로 냉난방도일(train·test 각각)",
+              "points": 5
+            },
+            {
+              "text": "도메인 특징 모델 MAE",
+              "points": 2
+            },
+            {
+              "text": "PolynomialFeatures(5, include_bias=False) → StandardScaler → 모델 파이프라인",
+              "points": 4
+            },
+            {
+              "text": "Ridge(alpha=1.0) / Lasso(alpha=1.0, max_iter 크게)",
+              "points": 3
+            },
+            {
+              "text": "훈련 MAE와 테스트 MAE 둘 다 출력",
+              "points": 3
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

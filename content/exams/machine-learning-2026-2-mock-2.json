@@ -1,0 +1,180 @@
+{
+  "$schema": "./exam.schema.json",
+  "id": "machine-learning-2026-2-mock-2",
+  "title": "머신러닝응용 기출형 모의고사 제2회",
+  "course": "머신러닝응용 · 2026-2학기",
+  "description": "공지 형식(서술 2 + 실습코드 2, 각 25점). 로지스틱 vs kNN / 랜덤포레스트 vs 부스팅 / 6주차 빈칸 / 7주차 코드 작성.",
+  "tags": [
+    "머신러닝",
+    "모의고사",
+    "기출형"
+  ],
+  "updated": "2026-10-26",
+  "sections": [
+    {
+      "id": "M2-E",
+      "title": "Ⅰ. 서술형 (각 25점)",
+      "questions": [
+        {
+          "id": "M2-1",
+          "kind": "essay",
+          "type": "5강 · 서술",
+          "points": 25,
+          "prompt": "대기질 4등급 분류(보통 53%, 좋음 24.5%, 나쁨 21.6%, 매우나쁨 0.9%)에 로지스틱 회귀와 kNN(k=11)을 적용했다.\n\n(1) 두 모델의 작동 원리를 각각 쓰시오. (8점)\n(2) 두 모델에 공통으로 필요한 전처리와 그 이유를 쓰시오. (5점)\n(3) 아래 결과를 근거로 두 모델의 장단점을 비교하고, 미세먼지 경보 시스템에 쓸 모델과 이유를 쓰시오. (12점)",
+          "box": "| 지표 | 로지스틱 회귀 | kNN (k=11) |\n|---|---|---|\n| 정확도 | 0.808 | 0.761 |\n| macro-F1 | 0.807 | 0.706 |\n| 재현율 좋음 / 보통 / 나쁨 / 매우나쁨 | 0.74 / 0.85 / 0.78 / 0.71 | 0.62 / 0.85 / 0.69 / 0.43 |\n| 학습 / 예측 시간 | 58ms / 1.5ms | 9ms / 27ms |",
+          "modelAnswer": "(1) **로지스틱 회귀**: 입력의 가중치 합 z = w·x + b를 시그모이드(다중분류는 소프트맥스)로 0–1 확률로 바꾸고, 가장 확률이 높은 클래스(이진이면 임계값 0.5)를 고른다. 로그손실을 최소화하도록 가중치를 반복 최적화로 학습한다. **kNN**: 학습 없이 훈련 데이터를 저장해 두고, 예측할 때 가장 가까운(유클리드 거리) k개 이웃의 다수결로 정한다(lazy learning). k가 작으면 과적합, 크면 과소적합.\n\n(2) **표준화(StandardScaler)**. kNN은 거리 기반이라 범위가 큰 PM10이 거리를 독점하고, 로지스틱은 계수 크기·최적화가 단위의 영향을 받는다. `make_pipeline`으로 묶어 스케일러를 train에만 fit한다(누수 방지).\n\n(3) 로지스틱이 정확도 0.808 vs 0.761, macro-F1 0.807 vs 0.706으로 앞서고, 특히 '매우나쁨' 재현율이 0.71 vs 0.43이다 — kNN은 이웃 다수결이라 드문 클래스가 다수 클래스에 묻힌다. 로지스틱은 예측이 빠르고(1.5ms vs 27ms), 확률을 줘서 임계값·class_weight로 재현율을 조정할 수 있고 계수(오즈비)로 해석된다. 단점은 경계가 선형이라는 것. kNN은 학습이 빠르고 비선형 경계를 표현하지만 예측이 느리고 k·스케일에 민감하며 해석이 어렵다. **경보 시스템**은 나쁜 날을 놓치는(FN) 비용이 헛경보보다 크므로 재현율이 중요하다 → 로지스틱 회귀를 쓰고, `class_weight=\"balanced\"`(매우나쁨 재현율 1.00)나 임계값을 낮춰 재현율을 더 확보한다.",
+          "keyPoints": [
+            {
+              "text": "로지스틱: 가중치 합 → 시그모이드/소프트맥스 확률, 로그손실 학습",
+              "points": 4
+            },
+            {
+              "text": "kNN: 저장 후 k개 이웃 다수결(lazy), k 크기와 과적합",
+              "points": 4
+            },
+            {
+              "text": "표준화 + 파이프라인(train만 fit), 거리·계수가 스케일에 민감",
+              "points": 5
+            },
+            {
+              "text": "성능 근거: 0.808 vs 0.761, macro-F1 0.807 vs 0.706",
+              "points": 3
+            },
+            {
+              "text": "매우나쁨 재현율 0.71 vs 0.43 (소수 클래스가 묻힘)",
+              "points": 3
+            },
+            {
+              "text": "장단점: 로지스틱 확률·해석·빠른 예측 / kNN 예측 느림·민감",
+              "points": 3
+            },
+            {
+              "text": "경보 → 재현율 → 로지스틱 + class_weight·임계값",
+              "points": 3
+            }
+          ]
+        },
+        {
+          "id": "M2-2",
+          "kind": "essay",
+          "type": "6·7강 · 서술",
+          "points": 25,
+          "prompt": "익일 초미세먼지 예측 실습에서 랜덤포레스트, XGBoost, LightGBM을 비교했다.\n\n(1) 그래디언트 부스팅의 작동 원리를 랜덤포레스트(배깅)와 대비해 설명하시오. (8점)\n(2) 학습률과 조기 종료의 역할을 아래 학습률 실험 결과로 설명하시오. (6점)\n(3) 이 데이터에 필요한 전처리·분할 방법을 쓰시오. (5점)\n(4) 결과를 근거로 세 모델의 장단점을 쓰시오. (6점)",
+          "box": "| 모델 (익일 PM2.5, 테스트 183일) | 테스트 MAE | 기준선 대비 | 비고 |\n|---|---|---|---|\n| 기준선 '내일 = 오늘' | 5.68 | – | 학습 없음 |\n| 랜덤포레스트 (300그루) | 5.24 | −7.7% | 깊은 트리 병렬 학습 |\n| XGBoost (조기 종료) | 5.20 | −8.4% | best_iteration 42 |\n| LightGBM (조기 종료) | 5.03 | −11.4% | best_iteration_ 50 |\n\n강의 슬라이드 값: RF 5.25 · XGBoost 5.02 · LightGBM 5.05 · XGBoost + lag 특징 4.71\n\n| learning_rate (트리 200개 고정) | 훈련 MAE | 테스트 MAE |\n|---|---|---|\n| 0.3 | 0.43 | 6.85 |\n| 0.1 | 1.91 | 6.07 |\n| 0.03 | 3.49 | 5.36 |\n| 0.005 | 5.45 | 5.53 |",
+          "modelAnswer": "(1) **랜덤포레스트(배깅)**: 깊은 트리를 부트스트랩 표본으로 **독립·병렬**로 키워 평균 → 분산 감소. **부스팅**: 얕은 트리를 **순서대로** 쌓아, 다음 트리가 지금까지 예측의 **잔차(손실의 기울기)** 를 학습하고 그 예측에 학습률 η를 곱해 더한다(F₂ = F₁ + η·f₂) → 편향 감소. XGBoost는 규제 내장·결측 자동·2차 근사, LightGBM은 손실이 큰 잎부터 키우는 leaf-wise 성장과 히스토그램 분할로 빠르다.\n\n(2) 학습률은 각 트리의 보정을 얼마나 반영할지다. 트리 200개 고정 시 0.3이면 훈련 MAE 0.43인데 테스트 6.85로 과적합, 0.005면 5.45 / 5.53으로 덜 학습(과소적합), 0.03이 5.36으로 가장 좋다. 학습률과 트리 수는 반비례하므로, 트리를 넉넉히(2000) 주고 학습률을 작게(0.03) 두고 **조기 종료**(검증 오차가 100라운드 개선 없으면 정지)로 트리 수를 데이터가 정하게 한다(LightGBM 50그루, 테스트 5.03).\n\n(3) 트리 기반이라 스케일링 불필요, 결측도 XGB·LGB가 자동 처리(오류코드 정제는 필요). 타깃은 PM25를 하루 앞당긴 PM25_익일. **시간 순서로 분할**: train 앞 80%로 학습, 뒤 20%로 조기 종료 판정, test는 마지막 평가만. 무작위 분할·test로 조기 종료는 누수. lag 특징(shift(1), shift(2))을 추가하면 개선된다.\n\n(4) 기준선 5.68 대비 RF 5.24, XGBoost 5.20, LightGBM 5.03. **RF**: 튜닝에 관대하고 병렬 학습, 트리 수를 늘려도 과적합 없음 / 성능 상한이 낮고 깊은 트리 300그루라 느림. **XGBoost**: 규제 내장·높은 성능 / 하이퍼파라미터에 민감(깊이 3 → 12에서 테스트 4.99 → 5.39), 트리 단위 병렬 불가. **LightGBM**: 가장 낮은 MAE·빠름·범주형 네이티브 / leaf-wise라 작은 데이터에서 과적합 위험, num_leaves·min_child_samples 조절 필요.",
+          "keyPoints": [
+            {
+              "text": "배깅: 깊은 트리 병렬·평균 → 분산↓",
+              "points": 3
+            },
+            {
+              "text": "부스팅: 얕은 트리 순차, 잔차 학습 후 η만큼 더함 → 편향↓",
+              "points": 5
+            },
+            {
+              "text": "학습률 실험: 0.3 과적합 / 0.005 과소 / 0.03 최선",
+              "points": 3
+            },
+            {
+              "text": "작은 학습률 + 큰 트리 수 + 조기 종료(검증 세트)",
+              "points": 3
+            },
+            {
+              "text": "시간순 80:20 분할, test로 조기 종료 금지, 스케일링 불필요",
+              "points": 5
+            },
+            {
+              "text": "결과: 5.68 → RF 5.24 → XGB 5.20 → LGB 5.03",
+              "points": 2
+            },
+            {
+              "text": "모델별 장단점 (RF 관대·병렬 / XGB 민감 / LGB 빠름·과적합 위험)",
+              "points": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M2-C",
+      "title": "Ⅱ. 실습코드 (각 25점)",
+      "questions": [
+        {
+          "id": "M2-3",
+          "kind": "short",
+          "type": "6주차 · 코드 빈칸",
+          "points": 25,
+          "prompt": "다음은 6주차 교통사고 결정트리·랜덤포레스트 코드다. 빈칸 **(1)**–**(10)** 을 채우시오.",
+          "box": "```python\nX_tr = pd.__(1)__(train.__(2)__(columns=[target]), columns=cat_cols)\nX_te = pd.get_dummies(test.drop(columns=[target]), columns=cat_cols)\nX_te = X_te.__(3)__(columns=X_tr.columns, __(4)__=0)\n\nfor depth in [2, 4, 6, 10, __(5)__]:\n    dt = DecisionTreeClassifier(max_depth=depth, random_state=42).fit(X_tr, y_tr)\n    train_accs.append(accuracy_score(y_tr, dt.predict(__(6)__)))\n    test_accs.append(accuracy_score(y_te, dt.predict(X_te)))\n\ndt3 = DecisionTreeClassifier(max_depth=3, random_state=42).fit(X_tr, y_tr)\nprint(__(7)__(dt3, feature_names=list(X_tr.columns)))\n\nrf = __(8)__(n_estimators=300, max_depth=None, min_samples_leaf=3,\n             random_state=42, n_jobs=__(9)__).fit(X_tr, y_tr)\nimp = pd.Series(rf.__(10)__, index=X_tr.columns).sort_values(ascending=False)\n```",
+          "blanks": [
+            [
+              "get_dummies"
+            ],
+            [
+              "drop"
+            ],
+            [
+              "reindex"
+            ],
+            [
+              "fill_value"
+            ],
+            [
+              "None"
+            ],
+            [
+              "X_tr"
+            ],
+            [
+              "export_text"
+            ],
+            [
+              "RandomForestClassifier"
+            ],
+            [
+              "-1"
+            ],
+            [
+              "feature_importances_"
+            ]
+          ],
+          "explanation": "원-핫 + `reindex`로 열 정합, 깊이 `None` = 무제한, 훈련 정확도는 `X_tr`로, 규칙은 `export_text`, RF는 `n_jobs=-1`, 중요도는 `feature_importances_`."
+        },
+        {
+          "id": "M2-4",
+          "kind": "essay",
+          "type": "7주차 · 코드 작성",
+          "points": 25,
+          "prompt": "익일 PM2.5 데이터 `train`, `test`(특징 8개: PM25, 기온, 풍속, 습도, 강수량, NO2, 월, 요일 / 타깃: PM25_익일)로 다음 코드를 작성하시오.\n\n(1) train을 시간 순서로 앞 80% 학습 / 뒤 20% 검증으로 나누고, '내일 = 오늘' 기준선의 테스트 MAE 출력 (7점)\n(2) XGBoost(트리 2000, 학습률 0.03, 깊이 5, 행·열 샘플링 0.8, 조기 종료 100)를 학습하고 테스트 MAE와 최적 트리 수 출력 (9점)\n(3) LightGBM(같은 설정, num_leaves 31)을 콜백 조기 종료로 학습하고 테스트 MAE와 최적 트리 수 출력 (9점)",
+          "modelAnswer": "```python\nfeatures = [\"PM25\", \"기온\", \"풍속\", \"습도\", \"강수량\", \"NO2\", \"월\", \"요일\"]\ntarget = \"PM25_익일\"\nX_tr, y_tr = train[features], train[target]\nX_te, y_te = test[features], test[target]\ncut = int(len(X_tr) * 0.8)                                                  # (1)\nX_fit, X_val = X_tr.iloc[:cut], X_tr.iloc[cut:]\ny_fit, y_val = y_tr.iloc[:cut], y_tr.iloc[cut:]\nprint(mean_absolute_error(y_te, X_te[\"PM25\"]))                              # 5.68\n\nxgb_model = xgb.XGBRegressor(n_estimators=2000, learning_rate=0.03, max_depth=5,   # (2)\n                             subsample=0.8, colsample_bytree=0.8,\n                             early_stopping_rounds=100, random_state=42)\nxgb_model.fit(X_fit, y_fit, eval_set=[(X_val, y_val)], verbose=False)\nprint(mean_absolute_error(y_te, xgb_model.predict(X_te)), xgb_model.best_iteration)\n\nlgb_model = lgb.LGBMRegressor(n_estimators=2000, learning_rate=0.03, num_leaves=31,  # (3)\n                              subsample=0.8, subsample_freq=1, colsample_bytree=0.8,\n                              random_state=42, verbose=-1)\nlgb_model.fit(X_fit, y_fit, eval_set=[(X_val, y_val)],\n              callbacks=[lgb.early_stopping(100, verbose=False)])\nprint(mean_absolute_error(y_te, lgb_model.predict(X_te)), lgb_model.best_iteration_)\n```",
+          "keyPoints": [
+            {
+              "text": "cut = int(len*0.8), iloc[:cut] / iloc[cut:] (섞지 않음)",
+              "points": 4
+            },
+            {
+              "text": "기준선 mean_absolute_error(y_te, X_te['PM25'])",
+              "points": 3
+            },
+            {
+              "text": "XGBRegressor 인자 6개 (early_stopping_rounds는 생성자에)",
+              "points": 5
+            },
+            {
+              "text": "fit(..., eval_set=[(X_val, y_val)]) + best_iteration",
+              "points": 4
+            },
+            {
+              "text": "LGBMRegressor(num_leaves=31, subsample_freq=1, ...)",
+              "points": 4
+            },
+            {
+              "text": "callbacks=[lgb.early_stopping(100)] + best_iteration_",
+              "points": 5
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
