@@ -14,85 +14,85 @@
   "sections": [
     {
       "id": "A",
-      "title": "가. 발음기호 고르기",
+      "title": "가. 발음기호와 뜻 고르기",
       "questions": [
         {
           "id": "M4-01",
-          "type": "2과 · 병음",
-          "prompt": "「中国人」의 발음기호(병음)으로 옳은 것은?",
+          "type": "2과 · 병음·뜻",
+          "prompt": "「中国人」의 발음기호와 뜻으로 옳은 것은?",
           "choices": [
-            "Zhōngguórěn",
-            "Zhōngguōrén",
-            "Zhōngguórén",
-            "Zhóngguórén"
+            "Zhōngguōrén — 중국",
+            "Zhōngguórén — 중국",
+            "Zhōngguórén — 중국인",
+            "Zhōngguōrén — 중국인"
           ],
           "answer": 3,
-          "explanation": "**中国人 Zhōngguórén** — 中 Zhōng(1성) + 国 guó(2성) + 人 rén(2성). 뜻: 중국인."
+          "explanation": "**中国人 Zhōngguórén** — 中 Zhōng(1성) + 国 guó(2성) + 人 rén(2성). 뜻: 중국인. Zhōngguōrén → 성조 오류. ‘중국’ → 中国 Zhōngguó의 뜻."
         },
         {
           "id": "M4-02",
-          "type": "3과 · 병음",
-          "prompt": "「名字」의 발음기호(병음)으로 옳은 것은? (교재 표기)",
+          "type": "3과 · 병음·뜻",
+          "prompt": "「名字」의 발음기호와 뜻으로 옳은 것은? (교재 표기)",
           "choices": [
-            "míngzi",
-            "míngzì",
-            "mǐngzi",
-            "míngzī"
+            "míngzi — 이름",
+            "míngzì — 이름",
+            "míngzi — ~라고 부르다",
+            "míngzì — ~라고 부르다"
           ],
           "answer": 1,
-          "explanation": "**名字 míngzi** — 名 míng(2성) + 字 zi(경성). 뜻: 이름."
+          "explanation": "**名字 míngzi** — 名 míng(2성) + 字 zi(경성). 뜻: 이름. míngzì → 성조 오류. ‘~라고 부르다’ → 叫 jiào의 뜻."
         },
         {
           "id": "M4-03",
-          "type": "4과 · 병음",
-          "prompt": "「姐姐」의 발음기호(병음)으로 옳은 것은? (교재 표기)",
+          "type": "4과 · 병음·뜻",
+          "prompt": "「姐姐」의 발음기호와 뜻으로 옳은 것은? (교재 표기)",
           "choices": [
-            "jiéjie",
-            "jiějie",
-            "jiějiě",
-            "jiějiè"
+            "jiějie — 여동생",
+            "jiějie — 언니, 누나",
+            "jiějiě — 언니, 누나",
+            "jiějiě — 여동생"
           ],
           "answer": 2,
-          "explanation": "**姐姐 jiějie** — 姐 jiě(3성) + 姐 jie(경성). 뜻: 언니, 누나."
+          "explanation": "**姐姐 jiějie** — 姐 jiě(3성) + 姐 jie(경성). 뜻: 언니, 누나. jiějiě → 성조 오류. ‘여동생’ → 妹妹 mèimei의 뜻."
         },
         {
           "id": "M4-04",
-          "type": "5과 · 병음",
-          "prompt": "「女朋友」의 발음기호(병음)으로 옳은 것은? (교재 표기)",
+          "type": "5과 · 병음·뜻",
+          "prompt": "「女朋友」의 발음기호와 뜻으로 옳은 것은? (교재 표기)",
           "choices": [
-            "nǚpēngyou",
-            "nǘpéngyou",
-            "nǚpéngyǒu",
-            "nǚpéngyou"
+            "nǚpéngyou — 친구",
+            "nǚpéngyǒu — 친구",
+            "nǚpéngyǒu — 여자친구",
+            "nǚpéngyou — 여자친구"
           ],
           "answer": 4,
-          "explanation": "**女朋友 nǚpéngyou** — 女 nǚ(3성) + 朋 péng(2성) + 友 you(경성). 뜻: 여자친구."
+          "explanation": "**女朋友 nǚpéngyou** — 女 nǚ(3성) + 朋 péng(2성) + 友 you(경성). 뜻: 여자친구. nǚpéngyǒu → 성조 오류. ‘친구’ → 朋友 péngyou의 뜻."
         },
         {
           "id": "M4-05",
-          "type": "6과 · 병음",
-          "prompt": "「家庭主妇」의 발음기호(병음)으로 옳은 것은?",
+          "type": "6과 · 병음·뜻",
+          "prompt": "「家庭主妇」의 발음기호와 뜻으로 옳은 것은?",
           "choices": [
-            "jiātǐng zhǔfù",
-            "jiātíng zhǔfù",
-            "jiātíng zhùfù",
-            "jiàtíng zhǔfù"
+            "jiātíng zhǔfǔ — 가정주부",
+            "jiātíng zhǔfù — 가정주부",
+            "jiātíng zhǔfǔ — 가정",
+            "jiātíng zhǔfù — 가정"
           ],
           "answer": 2,
-          "explanation": "**家庭主妇 jiātíng zhǔfù** — 家 jiā(1성) + 庭 tíng(2성) + 主 zhǔ(3성) + 妇 fù(4성). 뜻: 가정주부."
+          "explanation": "**家庭主妇 jiātíng zhǔfù** — 家 jiā(1성) + 庭 tíng(2성) + 主 zhǔ(3성) + 妇 fù(4성). 뜻: 가정주부. jiātíng zhǔfǔ → 성조 오류. ‘가정’ → 家庭 jiātíng의 뜻."
         },
         {
           "id": "M4-06",
-          "type": "6과 · 병음",
-          "prompt": "「医院」의 발음기호(병음)으로 옳은 것은?",
+          "type": "6과 · 병음·뜻",
+          "prompt": "「医院」의 발음기호와 뜻으로 옳은 것은?",
           "choices": [
-            "yīyuàn",
-            "yìyuàn",
-            "yīyuǎn",
-            "yīyuān"
+            "yīyuàn — 병원",
+            "yīyuàn — 의사",
+            "yíyuàn — 의사",
+            "yíyuàn — 병원"
           ],
           "answer": 1,
-          "explanation": "**医院 yīyuàn** — 医 yī(1성) + 院 yuàn(4성). 뜻: 병원."
+          "explanation": "**医院 yīyuàn** — 医 yī(1성) + 院 yuàn(4성). 뜻: 병원. yíyuàn → 성조 오류. ‘의사’ → 医生 yīshēng의 뜻."
         }
       ]
     },

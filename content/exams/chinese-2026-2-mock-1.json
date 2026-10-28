@@ -3,7 +3,7 @@
   "id": "chinese-2026-2-mock-1",
   "title": "중국어 중간 퀴즈형 모의고사 제1회 (원본 퀴즈)",
   "course": "중국어 · 2026-2학기",
-  "description": "중간 퀴즈 원본 32문항을 그대로 객관식으로 바꿨다(가. 발음기호 6 · 나. 한자와 발음기호 6 · 다. 괄호 6 · 라. 어순 3 · 마. 대답 6 · 바. 작문 5). 실제 시험이 이 형식으로 나온다. 범위: 발음편 ~ UNIT 06.",
+  "description": "중간 퀴즈 원본 32문항을 그대로 객관식으로 바꿨다(가. 발음기호와 뜻 6 · 나. 한자와 발음기호 6 · 다. 괄호 6 · 라. 어순 3 · 마. 대답 6 · 바. 작문 5). 실제 시험이 이 형식으로 나온다. 범위: 발음편 ~ UNIT 06.",
   "tags": [
     "중국어",
     "모의고사",
@@ -14,85 +14,85 @@
   "sections": [
     {
       "id": "A",
-      "title": "가. 발음기호 고르기",
+      "title": "가. 발음기호와 뜻 고르기",
       "questions": [
         {
           "id": "M1-01",
-          "type": "1과 · 병음",
-          "prompt": "「再见」의 발음기호(병음)으로 옳은 것은?",
+          "type": "1과 · 병음·뜻",
+          "prompt": "「再见」의 발음기호와 뜻으로 옳은 것은?",
           "choices": [
-            "zǎijiàn",
-            "zāijiàn",
-            "zàijiān",
-            "zàijiàn"
+            "zāijiàn — 안녕하세요",
+            "zāijiàn — 안녕히 가세요, 또 만나요",
+            "zàijiàn — 안녕하세요",
+            "zàijiàn — 안녕히 가세요, 또 만나요"
           ],
           "answer": 4,
-          "explanation": "**再见 zàijiàn** — 再 zài(4성) + 见 jiàn(4성). 뜻: 안녕히 가세요, 또 만나요."
+          "explanation": "**再见 zàijiàn** — 再 zài(4성) + 见 jiàn(4성). 뜻: 안녕히 가세요, 또 만나요. zāijiàn → 성조 오류. ‘안녕하세요’ → 你好 nǐ hǎo의 뜻."
         },
         {
           "id": "M1-02",
-          "type": "4과 · 병음",
-          "prompt": "「历史」의 발음기호(병음)으로 옳은 것은?",
+          "type": "4과 · 병음·뜻",
+          "prompt": "「历史」의 발음기호와 뜻으로 옳은 것은?",
           "choices": [
-            "lìshì",
-            "līshǐ",
-            "lìshǐ",
-            "lǐshǐ"
+            "lìshǐ — 책",
+            "līshǐ — 역사",
+            "lìshǐ — 역사",
+            "līshǐ — 책"
           ],
           "answer": 3,
-          "explanation": "**历史 lìshǐ** — 历 lì(4성) + 史 shǐ(3성). 뜻: 역사."
+          "explanation": "**历史 lìshǐ** — 历 lì(4성) + 史 shǐ(3성). 뜻: 역사. līshǐ → 성조 오류. ‘책’ → 书 shū의 뜻."
         },
         {
           "id": "M1-03",
-          "type": "발음편 · 병음",
-          "prompt": "「学校」의 발음기호(병음)으로 옳은 것은?",
+          "type": "발음편 · 병음·뜻",
+          "prompt": "「学校」의 발음기호와 뜻으로 옳은 것은?",
           "choices": [
-            "xuěxiào",
-            "xuéxiào",
-            "xuéxiāo",
-            "xuéxiǎo"
+            "xuéxiào — 공부하다",
+            "xuéxiào — 학교",
+            "xuěxiào — 공부하다",
+            "xuěxiào — 학교"
           ],
           "answer": 2,
-          "explanation": "**学校 xuéxiào** — 学 xué(2성) + 校 xiào(4성). 뜻: 학교."
+          "explanation": "**学校 xuéxiào** — 学 xué(2성) + 校 xiào(4성). 뜻: 학교. xuěxiào → 성조 오류. ‘공부하다’ → 学习 xuéxí의 뜻."
         },
         {
           "id": "M1-04",
-          "type": "6과 · 병음",
-          "prompt": "「医生」의 발음기호(병음)으로 옳은 것은?",
+          "type": "6과 · 병음·뜻",
+          "prompt": "「医生」의 발음기호와 뜻으로 옳은 것은?",
           "choices": [
-            "yīshēng",
-            "yīshèng",
-            "yíshēng",
-            "yìshēng"
+            "yīshēng — 의사",
+            "yīshēng — 병원",
+            "yīshéng — 병원",
+            "yīshéng — 의사"
           ],
           "answer": 1,
-          "explanation": "**医生 yīshēng** — 医 yī(1성) + 生 shēng(1성). 뜻: 의사."
+          "explanation": "**医生 yīshēng** — 医 yī(1성) + 生 shēng(1성). 뜻: 의사. yīshéng → 성조 오류. ‘병원’ → 医院 yīyuàn의 뜻."
         },
         {
           "id": "M1-05",
-          "type": "3과 · 병음",
-          "prompt": "「老师」의 발음기호(병음)으로 옳은 것은?",
+          "type": "3과 · 병음·뜻",
+          "prompt": "「老师」의 발음기호와 뜻으로 옳은 것은?",
           "choices": [
-            "lǎoshì",
-            "lǎoshī",
-            "làoshī",
-            "lǎoshí"
+            "lǎoshí — 의사",
+            "lǎoshī — 선생님",
+            "lǎoshī — 의사",
+            "lǎoshí — 선생님"
           ],
           "answer": 2,
-          "explanation": "**老师 lǎoshī** — 老 lǎo(3성) + 师 shī(1성). 뜻: 선생님."
+          "explanation": "**老师 lǎoshī** — 老 lǎo(3성) + 师 shī(1성). 뜻: 선생님. lǎoshí → 성조 오류. ‘의사’ → 医生 yīshēng의 뜻."
         },
         {
           "id": "M1-06",
-          "type": "3과 · 병음",
-          "prompt": "「朋友」의 발음기호(병음)으로 옳은 것은? (교재 표기)",
+          "type": "3과 · 병음·뜻",
+          "prompt": "「朋友」의 발음기호와 뜻으로 옳은 것은? (교재 표기)",
           "choices": [
-            "pēngyou",
-            "péngyǒu",
-            "péngyou",
-            "péngyóu"
+            "péngyou — 여자친구",
+            "péngyǒu — 친구",
+            "péngyou — 친구",
+            "péngyǒu — 여자친구"
           ],
           "answer": 3,
-          "explanation": "**朋友 péngyou** — 朋 péng(2성) + 友 you(경성). 뜻: 친구."
+          "explanation": "**朋友 péngyou** — 朋 péng(2성) + 友 you(경성). 뜻: 친구. péngyǒu → 성조 오류. ‘여자친구’ → 女朋友 nǚpéngyou의 뜻."
         }
       ]
     },

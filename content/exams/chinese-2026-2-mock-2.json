@@ -14,85 +14,85 @@
   "sections": [
     {
       "id": "A",
-      "title": "가. 발음기호 고르기",
+      "title": "가. 발음기호와 뜻 고르기",
       "questions": [
         {
           "id": "M2-01",
-          "type": "3과 · 병음",
-          "prompt": "「认识」의 발음기호(병음)으로 옳은 것은? (교재 표기)",
+          "type": "3과 · 병음·뜻",
+          "prompt": "「认识」의 발음기호와 뜻으로 옳은 것은? (교재 표기)",
           "choices": [
-            "rěnshi",
-            "rènshì",
-            "rènshí",
-            "rènshi"
+            "rènshi — 기쁘다",
+            "rènshí — 기쁘다",
+            "rènshí — (사람을) 알다",
+            "rènshi — (사람을) 알다"
           ],
           "answer": 4,
-          "explanation": "**认识 rènshi** — 认 rèn(4성) + 识 shi(경성). 뜻: (사람을) 알다."
+          "explanation": "**认识 rènshi** — 认 rèn(4성) + 识 shi(경성). 뜻: (사람을) 알다. rènshí → 성조 오류. ‘기쁘다’ → 高兴 gāoxìng의 뜻."
         },
         {
           "id": "M2-02",
-          "type": "3과 · 병음",
-          "prompt": "「高兴」의 발음기호(병음)으로 옳은 것은?",
+          "type": "3과 · 병음·뜻",
+          "prompt": "「高兴」의 발음기호와 뜻으로 옳은 것은?",
           "choices": [
-            "gāoxǐng",
-            "gāoxìng",
-            "gāoxīng",
-            "gáoxìng"
+            "gàoxìng — (사람을) 알다",
+            "gāoxìng — 기쁘다",
+            "gàoxìng — 기쁘다",
+            "gāoxìng — (사람을) 알다"
           ],
           "answer": 2,
-          "explanation": "**高兴 gāoxìng** — 高 gāo(1성) + 兴 xìng(4성). 뜻: 기쁘다."
+          "explanation": "**高兴 gāoxìng** — 高 gāo(1성) + 兴 xìng(4성). 뜻: 기쁘다. gàoxìng → 성조 오류. ‘(사람을) 알다’ → 认识 rènshi의 뜻."
         },
         {
           "id": "M2-03",
-          "type": "5과 · 병음",
-          "prompt": "「妹妹」의 발음기호(병음)으로 옳은 것은? (교재 표기)",
+          "type": "5과 · 병음·뜻",
+          "prompt": "「妹妹」의 발음기호와 뜻으로 옳은 것은? (교재 표기)",
           "choices": [
-            "mēimei",
-            "mèimèi",
-            "mèimei",
-            "mèiměi"
+            "mèimei — 언니, 누나",
+            "mèimèi — 여동생",
+            "mèimei — 여동생",
+            "mèimèi — 언니, 누나"
           ],
           "answer": 3,
-          "explanation": "**妹妹 mèimei** — 妹 mèi(4성) + 妹 mei(경성). 뜻: 여동생."
+          "explanation": "**妹妹 mèimei** — 妹 mèi(4성) + 妹 mei(경성). 뜻: 여동생. mèimèi → 성조 오류. ‘언니, 누나’ → 姐姐 jiějie의 뜻."
         },
         {
           "id": "M2-04",
-          "type": "6과 · 병음",
-          "prompt": "「北京」의 발음기호(병음)으로 옳은 것은?",
+          "type": "6과 · 병음·뜻",
+          "prompt": "「北京」의 발음기호와 뜻으로 옳은 것은?",
           "choices": [
-            "Běijīng",
-            "Béijīng",
-            "Běijìng",
-            "Běijíng"
+            "Běijīng — 베이징 (지명)",
+            "Běijīng — 중국",
+            "Béijīng — 중국",
+            "Béijīng — 베이징 (지명)"
           ],
           "answer": 1,
-          "explanation": "**北京 Běijīng** — 北 Běi(3성) + 京 jīng(1성). 뜻: 베이징 (지명)."
+          "explanation": "**北京 Běijīng** — 北 Běi(3성) + 京 jīng(1성). 뜻: 베이징 (지명). Béijīng → 성조 오류. ‘중국’ → 中国 Zhōngguó의 뜻."
         },
         {
           "id": "M2-05",
-          "type": "2과 · 병음",
-          "prompt": "「大学生」의 발음기호(병음)으로 옳은 것은?",
+          "type": "2과 · 병음·뜻",
+          "prompt": "「大学生」의 발음기호와 뜻으로 옳은 것은?",
           "choices": [
-            "dǎxuéshēng",
-            "dàxuéshēng",
-            "dàxuéshéng",
-            "dàxuēshēng"
+            "dàxuéshèng — 학교",
+            "dàxuéshēng — 대학생",
+            "dàxuéshēng — 학교",
+            "dàxuéshèng — 대학생"
           ],
           "answer": 2,
-          "explanation": "**大学生 dàxuéshēng** — 大 dà(4성) + 学 xué(2성) + 生 shēng(1성). 뜻: 대학생."
+          "explanation": "**大学生 dàxuéshēng** — 大 dà(4성) + 学 xué(2성) + 生 shēng(1성). 뜻: 대학생. dàxuéshèng → 성조 오류. ‘학교’ → 学校 xuéxiào의 뜻."
         },
         {
           "id": "M2-06",
-          "type": "6과 · 병음",
-          "prompt": "「工作」의 발음기호(병음)으로 옳은 것은?",
+          "type": "6과 · 병음·뜻",
+          "prompt": "「工作」의 발음기호와 뜻으로 옳은 것은?",
           "choices": [
-            "gōngzuò",
-            "góngzuò",
-            "gōngzuō",
-            "gōngzuǒ"
+            "gōngzuò — 일 / 일하다",
+            "gōngzuò — 하다",
+            "gōngzuō — 일 / 일하다",
+            "gōngzuō — 하다"
           ],
           "answer": 1,
-          "explanation": "**工作 gōngzuò** — 工 gōng(1성) + 作 zuò(4성). 뜻: 일 / 일하다."
+          "explanation": "**工作 gōngzuò** — 工 gōng(1성) + 作 zuò(4성). 뜻: 일 / 일하다. gōngzuō → 성조 오류. ‘하다’ → 做 zuò의 뜻."
         }
       ]
     },
