@@ -1,0 +1,474 @@
+{
+  "$schema": "./exam.schema.json",
+  "id": "system-programming-2026-2-mock-hard",
+  "title": "시스템프로그래밍 고난도 객관식 모의고사",
+  "course": "시스템프로그래밍 · 2026-2학기",
+  "description": "시험 범위 안에서 객관식으로 낼 수 있는 가장 어려운 수준으로 만든 예상 문제(실제 기출 아님). 5지선다 25문항 × 4점 = 100점, 권장 50분. 리다이렉션 처리 순서, 셸의 글롭 확장, 파일 기술자 할당과 오프셋 공유, O_APPEND, 표준 입출력 버퍼링, fread·fscanf 경계 조건 같은 함정을 다룬다. 셸 문항은 bash 기준이며 모든 정답은 실제 실행 결과로 확인했다.",
+  "tags": [
+    "시스템프로그래밍",
+    "모의고사",
+    "고난도",
+    "코드 추적",
+    "리다이렉션"
+  ],
+  "updated": "2026-10-30",
+  "sections": [
+    {
+      "id": "H1",
+      "title": "Ⅰ. 명령어 · 파이프 · 리다이렉션 (각 4점)",
+      "questions": [
+        {
+          "id": "MH-01",
+          "type": "리다이렉션 · 처리 순서",
+          "points": 4,
+          "prompt": "작업 디렉터리에 exist.txt만 있고 nofile.txt는 없다. bash에서 두 명령을 각각 실행했을 때 화면에 찍히는 `wc -l`의 값과 out.txt의 내용을 바르게 짝지은 것은?",
+          "box": "```bash\n(가) ls exist.txt nofile.txt 2>&1 > out.txt | wc -l\n(나) ls exist.txt nofile.txt > out.txt 2>&1 | wc -l\n```",
+          "choices": [
+            "(가) 0, out.txt = 오류 메시지 + exist.txt / (나) 1, out.txt = exist.txt 한 줄",
+            "(가) 1, out.txt = exist.txt 한 줄 / (나) 0, out.txt = 오류 메시지 + exist.txt",
+            "(가) 2, out.txt = 비어 있음 / (나) 0, out.txt = 오류 메시지 + exist.txt",
+            "(가) 1, out.txt = 오류 메시지 한 줄 / (나) 1, out.txt = exist.txt 한 줄",
+            "(가) 0, out.txt = exist.txt 한 줄 / (나) 0, out.txt = 오류 메시지 + exist.txt"
+          ],
+          "answer": 2,
+          "explanation": "파이프가 먼저 연결되고, 리다이렉션은 왼쪽부터 처리된다. `2>&1`은 '그 순간 1번이 가리키는 곳'을 2번에 복사한다. (가)는 1번이 파이프인 상태에서 2번이 파이프를 복사하고, 그 뒤 1번만 out.txt로 바뀐다 → 오류 한 줄만 wc로(1), out.txt에는 exist.txt. (나)는 1번이 먼저 out.txt로 바뀐 뒤 2번이 그것을 복사하므로 파이프로는 아무것도 가지 않는다(0). (zsh는 MULTIOS 기능 때문에 (가)가 2로 다르게 나온다. 시험은 bash 기준.)"
+        },
+        {
+          "id": "MH-02",
+          "type": "리다이렉션 · 함정",
+          "points": 4,
+          "prompt": "names.txt(park, kim, lee 세 줄)를 정렬해 원본에 저장하려고 `sort names.txt > names.txt`를 실행했다. 실행 후 names.txt의 상태와 그 이유로 옳은 것은?",
+          "choices": [
+            "kim, lee, park 순서로 저장된다 — sort가 다 읽은 뒤에 결과를 덮어쓰기 때문이다",
+            "원래 내용 뒤에 정렬 결과가 붙는다 — 같은 파일을 읽고 쓰면 이어 쓰기가 되기 때문이다",
+            "내용은 그대로 남고 오류만 나온다 — 입력과 출력이 같은 파일이면 셸이 실행을 막기 때문이다",
+            "park 한 줄만 남는다 — sort가 첫 줄을 읽은 순간 셸이 파일을 자르기 때문이다",
+            "빈 파일(0바이트)이 된다 — 셸이 sort를 실행하기 전에 `>`로 names.txt를 먼저 비우기 때문이다"
+          ],
+          "answer": 5,
+          "explanation": "리다이렉션은 명령이 실행되기 **전에** 셸이 처리한다. `>`가 names.txt를 길이 0으로 연 다음에 sort가 실행되므로 읽을 내용이 없다. 원본에 저장하려면 `sort names.txt > tmp && mv tmp names.txt`처럼 다른 파일을 거친다."
+        },
+        {
+          "id": "MH-03",
+          "type": "명령 연결 · 리다이렉션",
+          "points": 4,
+          "prompt": "dir1이 **이미 있을 때** `mkdir dir1 && echo OK || echo FAIL > r.txt`를 실행했다. 화면과 r.txt에 남는 것은?",
+          "choices": [
+            "화면: FAIL / r.txt: mkdir의 File exists 오류 메시지",
+            "화면: 아무것도 없음 / r.txt: mkdir 오류 메시지와 FAIL",
+            "화면: mkdir 오류 메시지와 OK / r.txt: 비어 있음",
+            "화면: mkdir의 File exists 오류 메시지 / r.txt: FAIL",
+            "화면: mkdir 오류 메시지 / r.txt: 만들어지지 않음"
+          ],
+          "answer": 4,
+          "explanation": "mkdir이 실패하므로 `&& echo OK`는 건너뛰고 `|| echo FAIL`이 실행된다. `> r.txt`는 마지막 echo에만 붙어 있어 FAIL만 파일로 가고, mkdir의 오류는 표준 오류(2번)로 화면에 나온다."
+        },
+        {
+          "id": "MH-04",
+          "type": "텍스트 처리 · 조합",
+          "points": 4,
+          "prompt": "app.log가 다음과 같을 때 「보기」에서 옳은 것만 모두 고른 것은?\n\n```\nerror: disk error\nERROR: net\nwarn: error-free\ninfo\n```",
+          "box": [
+            "`grep -c error app.log`의 출력은 2다",
+            "`grep -i error app.log | wc -l`의 출력은 3이다",
+            "첫 줄에 error가 두 번 있으므로 `grep -ic error app.log`의 출력은 4다",
+            "`wc -w app.log`가 출력하는 단어 수는 8이다",
+            "`grep -n ERROR app.log`는 `2:ERROR: net` 한 줄을 출력한다"
+          ],
+          "choices": [
+            "ㄱ, ㄷ",
+            "ㄴ, ㄹ",
+            "ㄱ, ㄴ, ㅁ",
+            "ㄱ, ㄴ, ㄹ, ㅁ",
+            "ㄴ, ㄷ, ㄹ, ㅁ"
+          ],
+          "answer": 4,
+          "fixedOrder": true,
+          "explanation": "grep -c는 일치한 **줄** 수를 센다. 대소문자를 구분하면 1·3번째 줄(error-free 포함) → 2, `-i`를 붙이면 ERROR 줄까지 3. 한 줄에 두 번 나와도 한 번으로 세므로 ㄷ은 거짓(실제 출력 3). 단어 수는 3 + 2 + 2 + 1 = 8(error-free는 한 단어). 대소문자를 구분하는 `grep -n ERROR`는 2번째 줄만 찾는다."
+        },
+        {
+          "id": "MH-05",
+          "type": "정렬 · 함정",
+          "points": 4,
+          "prompt": "scores.csv가 다음과 같을 때 두 명령의 출력을 차례로 쓴 것은?\n\n```\nkim,9\nlee,75\npark,100\nchoi,85\n```",
+          "box": "```bash\n(가) sort -t, -k2 scores.csv | head -1\n(나) sort -t, -k2 scores.csv | tail -1\n```",
+          "choices": [
+            "(가) park,100 / (나) kim,9",
+            "(가) kim,9 / (나) park,100",
+            "(가) choi,85 / (나) lee,75",
+            "(가) park,100 / (나) lee,75",
+            "(가) kim,9 / (나) choi,85"
+          ],
+          "answer": 1,
+          "explanation": "`-n`이 없으면 숫자도 **문자열**로 비교한다. 첫 글자가 1 < 7 < 8 < 9 이므로 100이 맨 앞, 9가 맨 뒤다. 점수 크기대로 정렬하려면 `-n`, 내림차순은 `-nr`이 필요하다."
+        },
+        {
+          "id": "MH-06",
+          "type": "필드 추출 · 비교",
+          "points": 4,
+          "prompt": "s.txt의 첫 줄은 kim과 90 사이에 **공백이 두 칸**, 둘째 줄은 lee와 75 사이에 공백이 한 칸이다. 두 명령의 출력으로 옳은 것은?",
+          "box": "```bash\n(가) cut -d' ' -f2 s.txt\n(나) awk '{print $2}' s.txt\n```",
+          "choices": [
+            "(가) 90, 75 / (나) 90, 75",
+            "(가) 90, 75 / (나) 빈 줄, 75",
+            "(가) 빈 줄, 75 / (나) 90, 75",
+            "(가) 빈 줄, 75 / (나) 빈 줄, 75",
+            "(가) kim, lee / (나) 90, 75"
+          ],
+          "answer": 3,
+          "explanation": "cut은 구분자 하나하나를 경계로 보므로 공백 두 칸 사이의 빈 문자열이 2번째 필드가 된다. awk는 기본적으로 연속된 공백(스페이스·탭)을 하나의 구분으로 보고 필드를 나눈다."
+        },
+        {
+          "id": "MH-07",
+          "type": "권한 · 계산",
+          "points": 4,
+          "prompt": "권한이 644인 파일 p.txt에 `chmod u+x,g-r,o=w p.txt`를 실행한 뒤 `ls -l`의 권한 표기와 8진수 값은?",
+          "choices": [
+            "`-rwx----w-` · 702",
+            "`-rwxr---w-` · 742",
+            "`-rwx---rw-` · 706",
+            "`-rwx----w-` · 722",
+            "`-rw-r---w-` · 642"
+          ],
+          "answer": 1,
+          "explanation": "u+x: rw- → rwx(7). g-r: r-- → ---(0). o=w: `=`는 추가가 아니라 그 권한으로 **지정**하므로 기존 r이 빠지고 w만 남는다(2)."
+        },
+        {
+          "id": "MH-08",
+          "type": "find · 글롭 확장",
+          "points": 4,
+          "prompt": "proj 디렉터리에 main.c가 있고, proj/src에 main.c와 util.c가 있다. proj에서 bash로 실행할 때 「보기」에서 옳은 것만 고른 것은?",
+          "box": [
+            "`find . -name *.c`는 ./main.c와 ./src/main.c만 출력한다",
+            "`find . -name \"*.c\"`는 세 파일을 모두 출력한다",
+            "`find . -name *.c`의 `*.c`는 find가 하위 디렉터리마다 직접 펼쳐 비교한다",
+            "proj에 extra.c를 하나 더 만들면 `find . -name *.c`는 인자 오류를 낸다",
+            "`find . -type d -name \"*.c\"`는 세 파일을 모두 출력한다"
+          ],
+          "choices": [
+            "ㄱ, ㄴ",
+            "ㄱ, ㄴ, ㄹ",
+            "ㄴ, ㄷ",
+            "ㄴ, ㄷ, ㅁ",
+            "ㄱ, ㄷ, ㄹ"
+          ],
+          "answer": 2,
+          "fixedOrder": true,
+          "explanation": "따옴표가 없으면 **셸이** 현재 디렉터리에서 `*.c`를 먼저 펼친다. main.c 하나뿐이면 `find . -name main.c`가 되어 이름이 main.c인 파일만 찾는다. .c 파일이 둘이면 `-name extra.c main.c`가 되어 find가 인자 오류를 낸다. 패턴을 find에 그대로 넘기려면 따옴표로 감싼다. `-type d`는 디렉터리만 찾는다."
+        }
+      ]
+    },
+    {
+      "id": "H2",
+      "title": "Ⅱ. GCC · make · 개발 도구 (각 4점)",
+      "questions": [
+        {
+          "id": "MH-09",
+          "type": "GCC · 조합",
+          "points": 4,
+          "prompt": "gcc 사용에 대한 「보기」의 설명 중 옳은 것만 고른 것은?",
+          "box": [
+            "`gcc -S a.c`로 만든 a.s를 `gcc -c a.s`로 오브젝트 파일 a.o로 만들 수 있다",
+            "`gcc -E a.c`는 전처리 결과를 a.i 파일로 자동 저장한다",
+            "`gcc -c a.c -o prog`로 만든 prog는 `./prog`로 실행되지 않는다",
+            "`gcc -o add.out main.o addnum.o`는 컴파일 없이 링크만 수행한다",
+            "`-g` 없이 컴파일한 실행 파일은 `objdump -d`로 디스어셈블할 수 없다"
+          ],
+          "choices": [
+            "ㄱ, ㄴ",
+            "ㄷ, ㅁ",
+            "ㄱ, ㄷ, ㄹ",
+            "ㄱ, ㄹ, ㅁ",
+            "ㄴ, ㄷ, ㄹ"
+          ],
+          "answer": 3,
+          "fixedOrder": true,
+          "explanation": "단계별 결과물은 다음 단계의 입력이 될 수 있다(.s → `-c` → .o). `-E`는 결과를 표준 출력으로 보내므로 파일로 남기려면 `> a.i`가 필요하다. `-c`는 링크하지 않으므로 prog는 실행 파일이 아니라 오브젝트 파일이다(실행 권한도 없어 Permission denied). .o만 주면 링크만 한다. 디스어셈블에는 기계어만 있으면 되고, `-g`는 디버깅 정보를 더할 뿐이다."
+        },
+        {
+          "id": "MH-10",
+          "type": "make · 추적",
+          "points": 4,
+          "prompt": "예제 1-3의 Makefile로 이미 add.out까지 만든 상태에서 아래 순서로 실행했다. ②와 ④의 동작으로 옳은 것은?",
+          "box": "```\nadd.out : $(OBJS)\n\t$(CC) $(CFLAGS) -o add.out $(OBJS) $(LIBS)\nch1_3_main.o : ch1_3_main.c\n\t$(CC) $(CFLAGS) -c ch1_3_main.c\nch1_3_addnum.o : ch1_3_addnum.c\n\t$(CC) $(CFLAGS) -c ch1_3_addnum.c\nclean:\n\trm -f $(OBJS) add.out *.o core\n```\n\n```bash\n① make                      # 변경 없음\n② touch ch1_3_main.c; make\n③ make clean\n④ make clean               # 한 번 더\n```",
+          "choices": [
+            "② 두 소스를 모두 다시 컴파일한 뒤 링크 / ④ 지울 파일이 없어 make가 오류로 멈춤",
+            "② `gcc -c ch1_3_main.c`만 실행하고 링크는 생략 / ④ rm -f가 다시 실행되고 오류 없이 끝남",
+            "② 바뀐 결과 파일이 없어 Nothing to be done / ④ Nothing to be done",
+            "② `gcc -c ch1_3_main.c`와 링크 명령만 실행 / ④ clean이 이미 최신이라 아무것도 하지 않음",
+            "② `gcc -c ch1_3_main.c`와 링크 명령만 실행 / ④ rm -f가 다시 실행되고 오류 없이 끝남"
+          ],
+          "answer": 5,
+          "explanation": "make는 타깃과 의존 파일의 수정 시각을 비교한다. main.c가 main.o보다 새로워져 main.o를 다시 만들고, 그러면 add.out이 main.o보다 오래되어 다시 링크한다. addnum.o는 그대로 쓴다. clean은 같은 이름의 파일이 없는 타깃이라 매번 명령이 실행되고, `rm -f`는 지울 파일이 없어도 오류를 내지 않는다."
+        },
+        {
+          "id": "MH-11",
+          "type": "objdump · strace · 조합",
+          "points": 4,
+          "prompt": "objdump와 strace에 대한 「보기」의 설명 중 옳은 것만 고른 것은?",
+          "box": [
+            "objdump는 프로그램을 실행하지 않고 파일을 분석하지만, strace는 프로그램을 실제로 실행하며 추적한다",
+            "printf()만 쓰는 프로그램을 strace로 보면 printf라는 이름의 시스템 호출이 나타난다",
+            "`strace ./a.out > out.txt`를 실행하면 추적 결과는 화면에, 프로그램의 출력은 out.txt에 남는다",
+            "`-g` 없이 컴파일하면 `objdump -d`가 기계어를 어셈블리로 바꾸지 못한다",
+            "`objdump -S`로 어셈블리 사이에 소스 줄을 함께 보려면 `-g`로 컴파일해야 한다"
+          ],
+          "choices": [
+            "ㄱ, ㄴ",
+            "ㄱ, ㄹ",
+            "ㄷ, ㄹ, ㅁ",
+            "ㄱ, ㄷ, ㅁ",
+            "ㄴ, ㄷ, ㅁ"
+          ],
+          "answer": 4,
+          "fixedOrder": true,
+          "explanation": "printf는 라이브러리 함수이고 실제 출력은 `write(1, …)` 시스템 호출로 보인다. strace의 추적 결과는 표준 오류로 나오므로 `>`로는 프로그램의 표준 출력만 파일로 간다. 디스어셈블에는 기계어만 필요하고, 소스 줄을 섞어 보는 `-S`에만 디버깅 정보(`-g`)가 필요하다."
+        },
+        {
+          "id": "MH-12",
+          "type": "strace · 결과 해석",
+          "points": 4,
+          "prompt": "다음은 어떤 예제를 리눅스에서 `strace ./a.out`으로 실행한 결과의 일부다. 이에 대한 설명으로 옳지 **않은** 것은?",
+          "box": "```\nopenat(AT_FDCWD, \"linux.txt\", O_RDONLY) = 3\nopenat(AT_FDCWD, \"linux.bak\", O_WRONLY|O_CREAT|O_TRUNC, 0644) = 4\nread(3, \"Linux \", 6)                    = 6\nwrite(4, \"Linux \", 6)                   = 6\nread(3, \"System\", 6)                    = 6\nwrite(4, \"System\", 6)                   = 6\n(중략)\nread(3, \"\\n\", 6)                        = 1\nwrite(4, \"\\n\", 1)                       = 1\nread(3, \"\", 6)                          = 0\nclose(3)                                = 0\nclose(4)                                = 0\n```",
+          "choices": [
+            "예제 4-5를 실행한 것이며, 소스의 open()이 openat 시스템 호출로 나타났다",
+            "생략된 부분까지 합치면 read는 6번, write는 5번 호출되었다",
+            "마지막 write의 세 번째 인자가 1인 것은 소스에서 6이 아니라 n을 넘겼기 때문이다",
+            "fd가 3과 4인 것은 0·1·2가 열려 있어 비어 있는 가장 작은 번호부터 받았기 때문이다",
+            "linux.bak을 열 때 O_TRUNC를 주었으므로 fd 3으로 읽는 linux.txt의 내용도 함께 비워진다"
+          ],
+          "answer": 5,
+          "explanation": "O_TRUNC는 그 open() 대상인 linux.bak에만 적용된다. 25바이트를 6바이트씩 읽으면 read의 리턴값은 6·6·6·6·1·0(6번)이고 write는 5번이다."
+        }
+      ]
+    },
+    {
+      "id": "H3",
+      "title": "Ⅲ. 예제 코드 추적 (각 4점)",
+      "questions": [
+        {
+          "id": "MH-13",
+          "type": "파일 기술자 · 추적",
+          "points": 4,
+          "prompt": "x.txt와 y.txt가 있고 표준 입출력(0·1·2)만 열린 상태에서 시작한다. 출력은?",
+          "box": "```cpp\na = open(\"x.txt\", O_RDONLY);\nb = open(\"y.txt\", O_RDONLY);\nclose(a);\nc = dup(b);\nclose(0);\na = open(\"x.txt\", O_RDONLY);\nprintf(\"%d %d %d\\n\", a, b, c);\n```",
+          "choices": [
+            "`3 4 5`",
+            "`5 4 3`",
+            "`0 4 3`",
+            "`0 4 5`",
+            "`3 4 3`"
+          ],
+          "answer": 3,
+          "explanation": "a = 3, b = 4. close(a)로 3이 비고 dup(b)는 비어 있는 가장 작은 번호 3을 받는다(c = 3). close(0) 뒤의 open은 0을 받는다(a = 0). 파일 기술자는 언제나 비어 있는 가장 작은 번호부터 할당된다."
+        },
+        {
+          "id": "MH-14",
+          "type": "dup · 오프셋 공유",
+          "points": 4,
+          "prompt": "linux.txt 내용은 `Linux System Programming` + 개행(총 25바이트)이다. 출력은?",
+          "box": "```cpp\nfd1 = open(\"linux.txt\", O_RDONLY);\nfd2 = dup(fd1);\nfd3 = open(\"linux.txt\", O_RDONLY);\n\nread(fd1, buf, 6);\nn = read(fd2, buf, 6);  buf[n] = '\\0';  printf(\"%s|\", buf);\nn = read(fd3, buf, 6);  buf[n] = '\\0';  printf(\"%s|\\n\", buf);\n```",
+          "choices": [
+            "`Linux |Linux |`",
+            "`System|Linux |`",
+            "`System|System|`",
+            "`Linux |System|`",
+            "`System| Progr|`"
+          ],
+          "answer": 2,
+          "explanation": "dup()으로 만든 fd2는 fd1과 **같은 열린 파일**을 가리켜 오프셋도 함께 쓴다. fd1이 6바이트를 읽어 오프셋이 6이 되었으므로 fd2는 `System`을 읽는다. 반면 open()을 다시 한 fd3은 자기 오프셋(0)을 따로 가지므로 `Linux `를 읽는다."
+        },
+        {
+          "id": "MH-15",
+          "type": "lseek · 추적",
+          "points": 4,
+          "prompt": "linux.txt 내용은 `Linux System Programming` + 개행(총 25바이트)이다. 출력은?",
+          "box": "```cpp\nfd = open(\"linux.txt\", O_RDONLY);\nlseek(fd, -12, SEEK_END);\nn = read(fd, buf, 4);  buf[n] = '\\0';\ncur = lseek(fd, 2, SEEK_CUR);\nn2 = read(fd, buf2, 255);\nprintf(\"%s %d %d\\n\", buf, (int)cur, n2);\n```",
+          "choices": [
+            "`Prog 19 6`",
+            "`Prog 17 8`",
+            "`ming 19 6`",
+            "`Prog 19 255`",
+            "`Prog 15 10`"
+          ],
+          "answer": 1,
+          "explanation": "크기 25에서 −12 → 오프셋 13(`P`). 4바이트 `Prog`를 읽으면 17이고, SEEK_CUR 기준 +2로 19(lseek은 새 오프셋을 리턴). 19부터 끝까지는 `mming` + 개행 6바이트다."
+        },
+        {
+          "id": "MH-16",
+          "type": "O_APPEND · 함정",
+          "points": 4,
+          "prompt": "app.txt의 내용이 `Linux System Programming` + 개행(25바이트)일 때 다음 코드를 실행한 뒤의 app.txt는?",
+          "box": "```cpp\nfd = open(\"app.txt\", O_WRONLY | O_APPEND);\nlseek(fd, 0, SEEK_SET);\nwrite(fd, \"Hi\", 2);\nclose(fd);\n```",
+          "choices": [
+            "맨 앞 두 글자가 Hi로 바뀌어 `Hinux System Programming`이 된다(25바이트)",
+            "내용이 지워지고 Hi만 남는다(2바이트)",
+            "기존 내용 뒤에 Hi가 붙어 27바이트가 된다",
+            "파일 끝이 아닌 곳으로 lseek해서 write가 실패한다(25바이트)",
+            "맨 앞에 Hi가 끼워져 `HiLinux System Programming`이 된다(27바이트)"
+          ],
+          "answer": 3,
+          "explanation": "O_APPEND로 연 파일은 write()할 때마다 오프셋이 파일 끝으로 옮겨진 뒤 쓰인다. 그래서 lseek(fd, 0, SEEK_SET)로 처음으로 옮겨도 쓰기는 끝에서 일어난다. 덮어쓰려면 O_APPEND 없이 열어야 하고, write는 중간에 끼워 넣기(insert)를 하지 않는다."
+        },
+        {
+          "id": "MH-17",
+          "type": "open 접근 모드 · 함정",
+          "points": 4,
+          "prompt": "test.txt가 없는 상태에서 다음 코드를 실행했을 때 출력과 test.txt의 크기는?",
+          "box": "```cpp\nfd = open(\"test.txt\", O_CREAT, 0644);\nn = write(fd, \"A\", 1);\nif (n == -1) perror(\"write\");\nprintf(\"fd=%d n=%d\\n\", fd, n);\n```",
+          "choices": [
+            "`fd=3 n=1` 출력, test.txt는 1바이트",
+            "`fd=-1 n=-1` 출력, test.txt는 만들어지지 않음",
+            "`write: Permission denied`와 `fd=3 n=-1` 출력, test.txt는 0바이트",
+            "`fd=3 n=0` 출력, test.txt는 0바이트",
+            "`write: Bad file descriptor`와 `fd=3 n=-1` 출력, test.txt는 0바이트"
+          ],
+          "answer": 5,
+          "explanation": "접근 모드를 쓰지 않으면 O_RDONLY(값 0)로 열린다. O_CREAT로 파일 생성은 성공해 fd 3을 받지만, 읽기 전용 fd에 write하면 -1을 리턴하고 errno는 EBADF(Bad file descriptor)다. 권한(0644) 문제가 아니라 열 때 정한 접근 모드의 문제다."
+        },
+        {
+          "id": "MH-18",
+          "type": "연산자 우선순위 · 추적",
+          "points": 4,
+          "prompt": "linux.txt 내용은 `Linux System Programming` + 개행(총 25바이트)이다. 괄호를 잘못 쓴 다음 코드를 실행한 뒤 linux.bak의 내용과 크기는?",
+          "box": "```cpp\nwhile ((n = read(rfd, buf, 6) > 0)) {\n    if (write(wfd, buf, n) != n) perror(\"Write\");\n}\n```",
+          "choices": [
+            "`Linux System Programming` + 개행 — 25바이트",
+            "`L` — 1바이트",
+            "`LLLLL` — 5바이트",
+            "`LS a` + 개행 — 5바이트",
+            "아무것도 쓰이지 않아 0바이트"
+          ],
+          "answer": 4,
+          "explanation": "`>`가 `=`보다 우선순위가 높아 `n = (read(...) > 0)`이다. 읽을 때마다 n은 1이라 buf의 첫 바이트만 쓴다: `Linux `→L, `System`→S, ` Progr`→공백, `amming`→a, 개행→개행. 여섯 번째 read가 0을 리턴하면 n이 0이 되어 끝난다."
+        },
+        {
+          "id": "MH-19",
+          "type": "버퍼링 · 출력 순서",
+          "points": 4,
+          "prompt": "다음 프로그램을 (가) 터미널에서 그대로 실행할 때와 (나) `./a.out | cat`처럼 파이프로 실행할 때 화면에 보이는 결과는?",
+          "box": "```cpp\nprintf(\"A\");\nwrite(1, \"B\", 1);\nprintf(\"C\\n\");\n```",
+          "choices": [
+            "(가) `ABC` / (나) `ABC`",
+            "(가) `BAC` / (나) `BAC`",
+            "(가) `ABC` / (나) `BAC`",
+            "(가) `BAC` / (나) `ABC`",
+            "(가) `A` 다음 줄에 `BC` / (나) `BAC`"
+          ],
+          "answer": 2,
+          "explanation": "printf는 고수준 입출력이라 버퍼에 쌓아 두고, write는 시스템 호출이라 즉시 출력한다. 터미널에서는 개행을 만날 때(줄 버퍼), 파이프·파일에서는 버퍼가 차거나 종료할 때 내보낸다. `A`에는 개행이 없으므로 두 경우 모두 write의 `B`가 먼저 나가고, 그 뒤 `AC`와 개행이 함께 나간다."
+        },
+        {
+          "id": "MH-20",
+          "type": "dup2 · 버퍼링",
+          "points": 4,
+          "prompt": "다음 프로그램을 (가) 터미널에서 실행할 때와 (나) `./a.out > log.txt`로 실행할 때의 결과로 옳은 것은?",
+          "box": "```cpp\nfd = open(\"out.txt\", O_CREAT | O_WRONLY | O_TRUNC, 0644);\nprintf(\"A\\n\");\ndup2(fd, 1);\nprintf(\"B\\n\");\nclose(fd);\n```",
+          "choices": [
+            "(가) 화면 `A`, out.txt `B` / (나) log.txt 비어 있음, out.txt `A`·`B` 두 줄",
+            "(가) 화면 `A`, out.txt `B` / (나) log.txt `A`, out.txt `B`",
+            "(가) 화면 없음, out.txt `A`·`B` / (나) log.txt 비어 있음, out.txt `A`·`B`",
+            "(가) 화면 `A`·`B`, out.txt 비어 있음 / (나) log.txt `A`·`B`, out.txt 비어 있음",
+            "(가) 화면 `A`, out.txt `B` / (나) log.txt `A`·`B`, out.txt 비어 있음"
+          ],
+          "answer": 1,
+          "explanation": "터미널로 가는 표준 출력은 줄 버퍼라 `A`와 개행이 dup2 전에 화면으로 나간다. 파일로 리다이렉션하면 완전 버퍼라 `A`가 버퍼에 남아 있다가, dup2로 1번이 out.txt를 가리킨 뒤 종료할 때 `B`와 함께 1번(out.txt)으로 기록된다. dup2 전에 확실히 내보내려면 `fflush(stdout)`을 호출한다."
+        },
+        {
+          "id": "MH-21",
+          "type": "fread · 경계 조건",
+          "points": 4,
+          "prompt": "linux.txt 내용은 `Linux System Programming` + 개행(총 25바이트)이다. 출력은? (보기의 `↵`는 개행 문자)",
+          "box": "```cpp\nwhile ((n = fread(buf, 5, 2, rfp)) > 0) {\n    buf[n * 5] = '\\0';\n    printf(\"[%s]\", buf);\n}\n```",
+          "choices": [
+            "`[Linux Syst][em Program]`",
+            "`[Linux][ Syst][em Pr][ogram][ming↵]`",
+            "`[Linux Syst][em Program][mming↵]`",
+            "`[Linux Syste][m Programm][ing↵]`",
+            "`[Linux Syst][em Program][ming↵]`"
+          ],
+          "answer": 5,
+          "explanation": "항목 크기 5 × 2개 = 10바이트씩 읽고 n = 2를 리턴한다. 20바이트 뒤에 남은 5바이트는 항목 하나를 온전히 채우므로 n = 1로 `ming`+개행을 출력하고(buf[1*5]에 널), 그다음에 0을 리턴한다. 예제 4-13(항목 크기 2)에서 마지막 1바이트가 항목을 못 채워 버려진 것과 대비된다."
+        },
+        {
+          "id": "MH-22",
+          "type": "fseek · ftell · 추적",
+          "points": 4,
+          "prompt": "linux.txt 내용은 `Linux System Programming` + 개행(총 25바이트)이다. 출력은?",
+          "box": "```cpp\nfp = fopen(\"linux.txt\", \"r\");\nfseek(fp, -4, SEEK_END);\nc1 = fgetc(fp);\nfseek(fp, 6, SEEK_SET);\nn = fread(buf, 1, 6, fp);  buf[n] = '\\0';\nr = fseek(fp, 0, SEEK_CUR);\nprintf(\"%c %s %d %ld\\n\", c1, buf, r, ftell(fp));\n```",
+          "choices": [
+            "`n System 6 12`",
+            "`i System 0 12`",
+            "`i System 12 12`",
+            "`g System 0 12`",
+            "`i System 0 6`"
+          ],
+          "answer": 2,
+          "explanation": "SEEK_END 기준 −4 → 오프셋 21이고, 그 글자는 끝부분 `ming`의 i다. 6으로 옮겨 6바이트 `System`을 읽으면 위치는 12. fseek은 성공하면 오프셋이 아니라 **0**을 리턴하고, 현재 위치는 ftell로 구한다(12)."
+        },
+        {
+          "id": "MH-23",
+          "type": "fscanf · 경계 조건",
+          "points": 4,
+          "prompt": "linux.dat 마지막에 실수로 `END` 줄이 들어 있다. 예제 4-15를 실행하면 어떻게 되는가?\n\n```\n2021001 80 95 80 95\n2021002 85 90 90 80\nEND\n```",
+          "box": "```cpp\nwhile ((n = fscanf(rfp, \"%d %d %d %d %d\", &id, &s1, &s2, &s3, &s4)) != EOF) {\n    printf(\"%d : %d\\n\", id, (s1 + s2 + s3 + s4) / 4);\n}\n```",
+          "choices": [
+            "두 학생을 출력한 뒤 `2021002 : 86`이 끝없이 반복 출력된다",
+            "두 학생을 출력하고 END에서 EOF를 만나 정상 종료한다",
+            "END를 0으로 읽어 `0 : 86` 한 줄을 더 출력하고 종료한다",
+            "첫 줄부터 형식 오류가 나서 아무것도 출력하지 않는다",
+            "fscanf가 -1을 리턴해 `2021002 : 86`이 한 번 더 출력되고 끝난다"
+          ],
+          "answer": 1,
+          "explanation": "fscanf는 END를 %d로 바꾸지 못하면 0을 리턴하고 END를 입력에 그대로 남긴다. 0은 EOF가 아니므로 루프가 계속되고, 같은 자리에서 매번 0을 리턴해 무한 반복된다(변수에는 이전 값이 남아 있다). 조건을 `== 5`로 쓰면 막을 수 있다."
+        },
+        {
+          "id": "MH-24",
+          "type": "디렉터리 · 조합",
+          "points": 4,
+          "prompt": "lab 디렉터리에 a.c, b.c, .hidden 파일과 하위 디렉터리 sub(안에 x.c)가 있다. `opendir(\"lab\")`으로 연 디렉터리 스트림에 대해 「보기」에서 옳은 것만 고른 것은?",
+          "box": [
+            "readdir()이 NULL을 리턴할 때까지 센 항목 수는 `ls -a lab | wc -l`의 출력과 같은 6이다",
+            "readdir()은 sub 안의 x.c까지 차례로 돌려준다",
+            "두 번 readdir한 뒤 `loc = telldir(dp)`로 저장하고 더 읽다가 `seekdir(dp, loc)` 하면, 다음 readdir은 세 번째 항목을 다시 돌려준다",
+            "rewinddir() 직후의 readdir()은 마지막으로 읽었던 항목의 다음 항목을 돌려준다",
+            "readdir()이 돌려주는 순서는 이름의 알파벳 순서로 보장된다"
+          ],
+          "choices": [
+            "ㄱ, ㄷ",
+            "ㄱ, ㄴ, ㄷ",
+            "ㄴ, ㄹ",
+            "ㄷ, ㅁ",
+            "ㄱ, ㄷ, ㅁ"
+          ],
+          "answer": 1,
+          "fixedOrder": true,
+          "explanation": "항목은 `.`, `..`, a.c, b.c, .hidden, sub 6개다(`ls lab | wc -l`은 숨김 파일과 `.`·`..`을 빼서 3). readdir은 하위 디렉터리 안으로 들어가지 않는다. telldir로 저장한 위치는 '다음에 읽을 항목'의 위치이므로 seekdir 뒤에는 세 번째 항목이 다시 나온다. rewinddir은 처음으로 돌리고, 순서는 정렬되지 않는다."
+        },
+        {
+          "id": "MH-25",
+          "type": "프로세스 정보 · 조합",
+          "points": 4,
+          "prompt": "예제 6-1(sysinfo), 6-5(times), 6-7(envp)에 대한 「보기」의 설명 중 옳은 것만 고른 것은?",
+          "box": [
+            "예제 6-5에서 for 루프를 지우고 sleep(2)만 남기면 Real time은 약 2.0초, User time은 약 0.0초다",
+            "예제 6-5의 tms_cutime은 times()를 호출한 프로세스 자신의 사용자 모드 시간이다",
+            "sysconf(_SC_CLK_TCK)가 100이면 times()의 리턴값이 250 늘었을 때 2.5초가 지난 것이다",
+            "예제 6-7을 `MYVAR=hi ./a.out | grep MYVAR`로 실행하면 `MYVAR=hi`가 출력된다",
+            "예제 6-1의 info.procs는 현재 터미널에서 실행한 프로세스의 수다"
+          ],
+          "choices": [
+            "ㄱ, ㄴ",
+            "ㄴ, ㄹ, ㅁ",
+            "ㄷ, ㄹ",
+            "ㄱ, ㄷ, ㅁ",
+            "ㄱ, ㄷ, ㄹ"
+          ],
+          "answer": 5,
+          "fixedOrder": true,
+          "explanation": "sleep 동안에는 CPU를 쓰지 않으므로 실제 경과 시간만 늘어난다. tms_cutime은 **자식** 프로세스들의 사용자 모드 시간 합이다. 클록 틱 수 ÷ 초당 틱 = 초(250 ÷ 100 = 2.5). `이름=값 명령`으로 실행하면 그 명령의 환경에만 변수가 들어가 envp에 나타난다. procs는 시스템 전체의 프로세스 수다."
+        }
+      ]
+    }
+  ]
+}
